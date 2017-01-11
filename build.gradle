@@ -1,0 +1,180 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://plugins.gradle.org/m2/" }
+  }
+  dependencies {
+    classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+    classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:3.0.3'
+  }
+}
+
+apply plugin: 'distribution'
+apply plugin: 'io.codearte.nexus-staging'
+
+allprojects {
+  apply plugin: 'eclipse'
+  apply plugin: 'idea'
+  apply plugin: 'nebula.provided-base'
+
+  ext {
+    projectVersion = '0.1'
+    gdxVersion = '1.9.5'
+    isSnapshot = '-SNAPSHOT'
+    libVersion = "$projectVersion.$gdxVersion$isSnapshot"
+  }
+}
+
+subprojects {
+  apply plugin: 'java'
+  apply plugin: 'maven'
+  apply plugin: 'signing'
+
+  ext {
+    wagonVersion = '2.10'
+    junitVersion = '4.12'
+    isReleaseVersion = !libVersion.endsWith("SNAPSHOT")
+  }
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+  }
+
+  sourceCompatibility = 1.6
+  targetCompatibility = 1.6
+  group = 'com.cyphercove'
+  version = libVersion
+  archivesBaseName = projectName
+  eclipse.project.name = projectName
+
+  configurations {
+    deployerJars
+  }
+
+  jar {
+    from project.sourceSets.main.output
+    from(project.sourceSets.main.allSource) {
+      include '**/*.xml'
+    }
+    baseName = archivesBaseName
+  }
+
+  dependencies {
+    provided "com.badlogicgames.gdx:gdx:$gdxVersion"
+    testCompile "junit:junit:$junitVersion"
+    deployerJars "org.apache.maven.wagon:wagon-ssh:$wagonVersion"
+    deployerJars "org.apache.maven.wagon:wagon-http:$wagonVersion"
+  }
+
+  task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+  }
+
+  task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+  }
+
+  artifacts {
+    archives javadocJar, sourcesJar
+  }
+
+  signing {
+    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+  }
+
+  uploadArchives {
+    repositories {
+      mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+          authentication(userName: ossrhUsername, password: ossrhPassword)
+        }
+
+        snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+          authentication(userName: ossrhUsername, password: ossrhPassword)
+        }
+
+        pom.project {
+          name = projectName
+          packaging 'jar'
+          description = projectDesc
+          url 'http://github.com/cyphercove/gdx-cclibs/'
+
+          licenses {
+            license {
+              name 'The Apache License, Version 2.0'
+              url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+          }
+          
+          scm {
+            connection 'scm:git:git@github.com:cyphercove/gdx-cclibs.git'
+            developerConnection 'scm:git:git@cyphercove/gdx-cclibs.git'
+            url 'http://github.com/cyphercove/gdx-cclibs/'
+          }
+          
+          organization {
+          	name 'Cypher Cove'
+          	url 'www.cyphercove.com'
+          }
+
+        }
+      }
+    }
+  }
+}
+
+// Invokes 'build' and 'install' tasks on all projects in the correct order.
+// Prefer this over 'gradle build install' when changing the version of library.
+task installAll(dependsOn: ['installBase', 'lml-vis:build', 'lml-vis:install',
+  'mvc:build', 'mvc:install', 'autumn/natives/android:build',
+  'autumn/natives/android:install', 'autumn/natives/fcs:build',
+  'autumn/natives/fcs:install', 'autumn/natives/gwt:build',
+  'autumn/natives/gwt:install', 'websocket/natives/common:build',
+  'websocket/natives/common:install', 'websocket/natives/gwt:build',
+  'websocket/natives/gwt:install', 'websocket/natives/serialization:build',
+  'websocket/natives/serialization:install', 'lml-uedi:build',
+  'lml-uedi:install']) 
+task installBase(dependsOn: ['installKiwi', 'lml:build', 'lml:install',
+  'autumn:build', 'autumn:install', 'websocket:build', 'websocket:install',
+  'uedi:build', 'uedi:install'])
+task installKiwi(dependsOn: ['kiwi:build', 'kiwi:install'])
+
+nexusStaging {
+  packageGroup = 'com.cyphercove'
+  username = ossrhUsername
+  password = ossrhPassword
+}
+
+distributions {
+  main {
+    baseName = libVersion
+    contents {
+      project.subprojects.each { sub ->
+        into('lib') {
+          from sub.jar
+        }
+        into('src') {
+          from sub.sourcesJar
+        }
+        into('doc') {
+          from sub.javadocJar
+        }
+      }
+    }
+  }
+}
+
+tasks.eclipse.doLast {
+  delete ".project"
+  delete ".classpath"
+  delete ".settings/"
+}
