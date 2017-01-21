@@ -6,19 +6,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.NumberUtils;
 import com.cyphercove.gdx.flexbatch.utils.AttributeOffsets;
 import com.cyphercove.gdx.flexbatch.utils.RenderContextAccumulator;
 
-/** A {@link Quad} {@link com.cyphercove.gdx.flexbatch.Batchable Batchable} that supports a single texture at a time, 
- * with two-dimensional position and color. It is designed to be drawn in a 2D plane, and is commonly called a sprite.
+/** A {@link Quad} {@link com.cyphercove.gdx.flexbatch.Batchable Batchable} that supports a single texture at a time, with
+ * two-dimensional position and color. It is designed to be drawn in a 2D plane, and is commonly called a sprite.
  * <p>
- * The default origin of a Quad2D is its bottom left corner. Its origin is used for positioning, and as the center of 
- * rotation and scaling.
+ * The default origin of a Quad2D is its bottom left corner. Its origin is used for positioning, and as the center of rotation and
+ * scaling.
  * <p>
  * It may be subclassed to create a Batchable class that supports zero or multiple textures and additional attributes--see
- * {@link #getNumberOfTextures()} and {@link #addVertexAttributes(com.badlogic.gdx.utils.Array) addVertexAttributes()}.
- * Such a subclass would not be compatible with a FlexBatch that was instantiated for the base Quad2D type.
+ * {@link #getNumberOfTextures()} and {@link #addVertexAttributes(com.badlogic.gdx.utils.Array) addVertexAttributes()}. Such a
+ * subclass would not be compatible with a FlexBatch that was instantiated for the base Quad2D type.
  * 
  * @author cypherdare */
 public class Quad2D extends Quad {
@@ -27,30 +26,30 @@ public class Quad2D extends Quad {
 	protected final boolean isPosition3D () {
 		return false;
 	}
-	
+
 	protected boolean isTextureCoordinate3D () {
 		return false;
 	}
-	
+
 	protected void prepareSharedContext (RenderContextAccumulator renderContext) {
 		super.prepareSharedContext(renderContext);
 		renderContext.setDepthMasking(false);
 	}
-	
+
 	public void refresh () {
 		super.refresh();
 		rotation = 0;
 	}
 
-	/** Sets the position of the bottom left of the texture region in world space. 
+	/** Sets the position of the bottom left of the texture region in world space.
 	 * @return This object for chaining. */
 	public Quad2D position (float x, float y) {
 		this.x = x;
 		this.y = y;
 		return this;
 	}
-	
-	/** Sets the position of the bottom left of the texture region in world space. 
+
+	/** Sets the position of the bottom left of the texture region in world space.
 	 * @return This object for chaining. */
 	public Quad2D position (Vector2 position) {
 		x = position.x;
@@ -148,63 +147,63 @@ public class Quad2D extends Quad {
 	}
 
 	// Chain methods must be overridden to allow return of subclass type.
-	
-	public Quad2D texture (Texture texture){
+
+	public Quad2D texture (Texture texture) {
 		super.texture(texture);
 		return this;
 	}
-	
-	public Quad2D region (float u, float v, float u2, float v2){
+
+	public Quad2D region (float u, float v, float u2, float v2) {
 		super.region(u, v, u2, v2);
 		return this;
 	}
-	
-	public Quad2D textureRegion (TextureRegion region){
+
+	public Quad2D textureRegion (TextureRegion region) {
 		super.textureRegion(region);
 		return this;
 	}
-	
-	public Quad2D flip (boolean flipX, boolean flipY){
+
+	public Quad2D flip (boolean flipX, boolean flipY) {
 		super.flip(flipX, flipY);
 		return this;
 	}
-	
-	public Quad2D flipAll (boolean flipX, boolean flipY){
+
+	public Quad2D flipAll (boolean flipX, boolean flipY) {
 		super.flipAll(flipX, flipY);
 		return this;
 	}
-	
-	public Quad2D size (float width, float height){
+
+	public Quad2D size (float width, float height) {
 		super.size(width, height);
 		return this;
 	}
-	
-	public Quad2D origin (float originX, float originY){
+
+	public Quad2D origin (float originX, float originY) {
 		super.origin(originX, originY);
 		return this;
 	}
-	
-	public Quad2D rotateCoordinates90 (boolean clockwise){
+
+	public Quad2D rotateCoordinates90 (boolean clockwise) {
 		super.rotateCoordinates90(clockwise);
 		return this;
 	}
-	
-	public Quad2D color (Color color){
+
+	public Quad2D color (Color color) {
 		super.color(color);
 		return this;
 	}
-	
-	public Quad2D color (float r, float g, float b, float a){
+
+	public Quad2D color (float r, float g, float b, float a) {
 		super.color(r, g, b, a);
 		return this;
 	}
-	
-	public Quad2D color (float floatBits){
+
+	public Quad2D color (float floatBits) {
 		super.color(floatBits);
 		return this;
 	}
-	
-	public Quad2D scale (float scaleX, float scaleY){
+
+	public Quad2D scale (float scaleX, float scaleY) {
 		super.scale(scaleX, scaleY);
 		return this;
 	}

@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.cyphercove.gdx.flexbatch.utils.AttributeOffsets;
@@ -24,7 +23,7 @@ import com.cyphercove.gdx.flexbatch.utils.SortableBatchable;
  * {@link #getNumberOfTextures()} and {@link #addVertexAttributes(com.badlogic.gdx.utils.Array) addVertexAttributes()}. Such a
  * subclass would not be compatible with a FlexBatch that was instantiated for the base Sprite type.
  * 
- * @author cypherdare*/
+ * @author cypherdare */
 public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 
 	public float z;
@@ -33,40 +32,46 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 	public int srcBlendFactor = GL20.GL_SRC_ALPHA;
 	public int dstBlendFactor = GL20.GL_ONE_MINUS_SRC_ALPHA;
 
-	protected static final Quaternion TMPQ = new Quaternion();
-	protected static final Vector3 TMP1 = new Vector3();
-	protected static final Vector3 TMP2 = new Vector3();
-	protected static final Vector3 TMP3 = new Vector3();
-	
+	private static final Quaternion TMPQ = new Quaternion();
+	private static final Vector3 TMP1 = new Vector3();
+	private static final Vector3 TMP2 = new Vector3();
+	private static final Vector3 TMP3 = new Vector3();
+
 	/** Commonly used blend function factor pairs, for convenience. */
 	public enum Blending {
-		/**GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA */
-		Alpha, 
-		/**GL_ONE, GL_ONE_MINUS_SRC_ALPHA */
-		PremultipliedAlpha, 
-		/**GL_ONE, GL_ONE */
+		/** GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA */
+		Alpha,
+		/** GL_ONE, GL_ONE_MINUS_SRC_ALPHA */
+		PremultipliedAlpha,
+		/** GL_ONE, GL_ONE */
 		Additive
 	}
-	
+
 	/** A Quad3D that starts opaque. */
-	public Quad3D (){}
-	
+	public Quad3D () {
+	}
+
 	/** A Quad3D that starts with blending enabled, with the specified blend factors. */
-	public Quad3D (int srcBlendFactor, int dstBlendFactor){
+	public Quad3D (int srcBlendFactor, int dstBlendFactor) {
 		opaque = false;
 		this.srcBlendFactor = srcBlendFactor;
 		this.dstBlendFactor = dstBlendFactor;
 	}
-	
+
 	/** A Quad3D that starts with blending enabled, and a common set of blend factors. */
-	public Quad3D (Blending blending){
+	public Quad3D (Blending blending) {
 		opaque = false;
-		switch (blending){
+		switch (blending) {
 		case PremultipliedAlpha:
 			srcBlendFactor = GL20.GL_ONE;
+			dstBlendFactor = GL20.GL_ONE_MINUS_SRC_ALPHA;
 			break;
 		case Additive:
 			srcBlendFactor = dstBlendFactor = GL20.GL_ONE;
+			break;
+		case Alpha:
+			srcBlendFactor = GL20.GL_ALPHA;
+			dstBlendFactor = GL20.GL_ONE_MINUS_SRC_ALPHA;
 			break;
 		}
 	}
@@ -74,7 +79,7 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 	protected final boolean isPosition3D () {
 		return true;
 	}
-	
+
 	protected boolean isTextureCoordinate3D () {
 		return false;
 	}
@@ -91,7 +96,7 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		super.prepareSharedContext(renderContext);
 		renderContext.setDepthTesting(true);
 	}
-	
+
 	protected boolean prepareContext (RenderContextAccumulator renderContext, int remainingVertices, int remainingTriangles) {
 		boolean needsFlush = super.prepareContext(renderContext, remainingVertices, remainingTriangles);
 		needsFlush |= renderContext.setBlending(!opaque);
@@ -100,7 +105,7 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		}
 		return needsFlush;
 	}
-	
+
 	public boolean hasEquivalentTextures (Quad3D other) {
 		for (int i = 0; i < textures.length; i++) {
 			if (other.textures[i] != textures[i]) return false;
@@ -116,35 +121,35 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		srcBlendFactor = GL20.GL_SRC_ALPHA;
 		dstBlendFactor = GL20.GL_ONE_MINUS_SRC_ALPHA;
 	}
-	
+
 	/** Disables blending. Blending is disabled by default.
 	 * @return This object for chaining. */
 	public Quad3D opaque () {
 		opaque = true;
 		return this;
 	}
-	
+
 	/** Enables blending. Blending is disabled by default.
 	 * @return This object for chaining. */
-	public Quad3D blend (){
+	public Quad3D blend () {
 		opaque = false;
 		return this;
 	}
-	
+
 	/** Enables blending and sets the blend function parameters. Blending is disabled by default.
 	 * @return This object for chaining. */
-	public Quad3D blend (int srcBlendFactor, int dstBlendFactor){
+	public Quad3D blend (int srcBlendFactor, int dstBlendFactor) {
 		opaque = false;
 		this.srcBlendFactor = srcBlendFactor;
 		this.dstBlendFactor = dstBlendFactor;
 		return this;
 	}
-	
+
 	/** Enables blending and sets the blend function parameters to a commonly used pair. Blending is disabled by default.
 	 * @return This object for chaining. */
-	public Quad3D blend (Blending blending){
+	public Quad3D blend (Blending blending) {
 		opaque = false;
-		switch (blending){
+		switch (blending) {
 		case Alpha:
 			srcBlendFactor = GL20.GL_SRC_ALPHA;
 			dstBlendFactor = GL20.GL_ONE_MINUS_SRC_ALPHA;
@@ -168,7 +173,7 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		this.z = z;
 		return this;
 	}
-	
+
 	/** Sets the position of the center (plus current origin offset) of the texture region in world space.
 	 * @return This object for chaining. */
 	public Quad3D position (Vector3 position) {
@@ -177,7 +182,7 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		this.z = position.z;
 		return this;
 	}
-	
+
 	/** Translates the current position by the given amount.
 	 * @return This object for chaining. */
 	public Quad3D translate (float x, float y, float z) {
@@ -186,7 +191,7 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		this.z += z;
 		return this;
 	}
-	
+
 	/** Translates the current position by the given amount.
 	 * @return This object for chaining. */
 	public Quad3D translate (Vector3 amount) {
@@ -195,49 +200,48 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		this.z += amount.z;
 		return this;
 	}
-	
-	/**Sets the rotation to a specific Quaternion. 
+
+	/** Sets the rotation to a specific Quaternion.
 	 * @return This object for chaining. */
-	public Quad3D rotation (Quaternion rotation){
+	public Quad3D rotation (Quaternion rotation) {
 		this.rotation.set(rotation);
 		return this;
 	}
-	
-	/**Sets the rotation to a specific Quaternion. 
+
+	/** Sets the rotation to a specific Quaternion.
 	 * @return This object for chaining. */
-	public Quad3D rotation (float x, float y, float z, float w){
+	public Quad3D rotation (float x, float y, float z, float w) {
 		rotation.set(x, y, z, w);
 		return this;
 	}
-	
+
 	/** Sets the rotation to a specific angle about an axis.
 	 * @return This object for chaining. */
-	public Quad3D rotation (Vector3 axis, float angle){
+	public Quad3D rotation (Vector3 axis, float angle) {
 		rotation.setFromAxis(axis, angle);
 		return this;
 	}
-	
+
 	/** Sets the rotation to specific Euler angles.
 	 * @return This object for chaining. */
-	public Quad3D rotation (float yaw, float pitch, float roll){
+	public Quad3D rotation (float yaw, float pitch, float roll) {
 		rotation.setEulerAngles(yaw, pitch, roll);
 		return this;
 	}
-	
-	/** Sets the rotation based on a direction vector and up vector. The input vectors <b>do not</b> need to be
-	 * normalized.
+
+	/** Sets the rotation based on a direction vector and up vector. The input vectors <b>do not</b> need to be normalized.
 	 * @return This object for chaining. */
-	public Quad3D rotation (float directionX, float directionY, float directionZ, float upX, float upY, float upZ){
+	public Quad3D rotation (float directionX, float directionY, float directionZ, float upX, float upY, float upZ) {
 		TMP2.set(directionX, directionY, directionZ).nor();
 		TMP1.set(upX, upY, upZ).nor().crs(TMP2).nor();
 		TMP2.crs(TMP1).nor();
 		rotation.setFromAxes(TMP1.x, TMP2.x, directionX, TMP1.y, TMP2.y, directionY, TMP1.z, TMP2.z, directionZ);
 		return this;
 	}
-	
+
 	/** Sets the rotation based on a direction vector and up vector. The input vectors <b>must be</b> normalized.
 	 * @return This object for chaining. */
-	public Quad3D rotation (Vector3 direction, Vector3 up){
+	public Quad3D rotation (Vector3 direction, Vector3 up) {
 		TMP1.set(up).crs(direction).nor();
 		TMP2.set(direction).crs(TMP1).nor();
 		rotation.setFromAxes(TMP1.x, TMP2.x, direction.x, TMP1.y, TMP2.y, direction.y, TMP1.z, TMP2.z, direction.z);
@@ -254,45 +258,45 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		rotation.setFromAxes(TMP1.x, TMP2.x, TMP3.x, TMP1.y, TMP2.y, TMP3.y, TMP1.z, TMP2.z, TMP3.z);
 		return this;
 	}
-	
-	/** Sets the rotation to look at the camera, relative to the current position. The quad's top side will be
-	 * oriented to match the camera's.
-	 * @return This object for chaining. */	
-	public Quad3D billboard (Camera camera){
+
+	/** Sets the rotation to look at the camera, relative to the current position. The quad's top side will be oriented to match
+	 * the camera's.
+	 * @return This object for chaining. */
+	public Quad3D billboard (Camera camera) {
 		return lookAt(camera.position, camera.up);
 	}
 
 	/** Sets the rotation to look at the camera, relative to the current position.
 	 * @param up The direction the top of the quad should be pointing.
-	 * @return This object for chaining. */	
-	public Quad3D billboard (Camera camera, Vector3 up){
+	 * @return This object for chaining. */
+	public Quad3D billboard (Camera camera, Vector3 up) {
 		return lookAt(camera.position, up);
 	}
-	
+
 	/** Rotates the current orientation by a specific Quaternion.
 	 * @return This object for chaining. */
-	public Quad3D rotate (Quaternion rotation){
+	public Quad3D rotate (Quaternion rotation) {
 		this.rotation.mul(rotation);
 		return this;
 	}
-	
+
 	/** Rotates from the current orientation by a specific angle about the X axis.
 	 * @return This object for chaining. */
-	public Quad3D rotateX (float angle){
+	public Quad3D rotateX (float angle) {
 		rotation.mul(TMPQ.setFromAxis(1, 0, 0, angle));
 		return this;
 	}
-	
+
 	/** Rotates from the current orientation by a specific angle about the Y axis.
 	 * @return This object for chaining. */
-	public Quad3D rotateY (float angle){
+	public Quad3D rotateY (float angle) {
 		rotation.mul(TMPQ.setFromAxis(0, 1, 0, angle));
 		return this;
 	}
-	
+
 	/** Rotates from the current orientation by a specific angle about the Z axis.
 	 * @return This object for chaining. */
-	public Quad3D rotateZ (float angle){
+	public Quad3D rotateZ (float angle) {
 		rotation.mul(TMPQ.setFromAxis(0, 0, 1, angle));
 		return this;
 	}
@@ -305,7 +309,7 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		float top = bottom + height;
 
 		int i = vertexStartingIndex;
-		
+
 		// bottom left
 		TMP1.set((left - originX) * scaleX, (bottom - originY) * scaleY, 0); // local vertex position
 		rotation.transform(TMP1); // local vertex position rotated
@@ -313,7 +317,7 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		vertices[i + 1] = TMP1.y + y;
 		vertices[i + 2] = TMP1.z + z;
 		i += vertexSize;
-		
+
 		// top left
 		TMP1.set((left - originX) * scaleX, (top - originY) * scaleY, 0);
 		rotation.transform(TMP1);
@@ -321,7 +325,7 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		vertices[i + 1] = TMP1.y + y;
 		vertices[i + 2] = TMP1.z + z;
 		i += vertexSize;
-		
+
 		// top right
 		TMP1.set((right - originX) * scaleX, (top - originY) * scaleY, 0);
 		rotation.transform(TMP1);
@@ -329,7 +333,7 @@ public class Quad3D extends Quad implements SortableBatchable<Quad3D> {
 		vertices[i + 1] = TMP1.y + y;
 		vertices[i + 2] = TMP1.z + z;
 		i += vertexSize;
-		
+
 		// bottom right
 		TMP1.set((right - originX) * scaleX, (bottom - originY) * scaleY, 0);
 		rotation.transform(TMP1);

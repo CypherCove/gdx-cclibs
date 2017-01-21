@@ -1,26 +1,18 @@
 
 package com.cyphercove.gdx.flexbatch.batchable;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.cyphercove.gdx.flexbatch.Batchable;
-import com.cyphercove.gdx.flexbatch.Batchable.FixedSizeBatchable;
 import com.cyphercove.gdx.flexbatch.utils.AttributeOffsets;
 import com.cyphercove.gdx.flexbatch.utils.BatchablePreparation;
-import com.cyphercove.gdx.flexbatch.utils.Region2D;
 import com.cyphercove.gdx.flexbatch.utils.RenderContextAccumulator;
-import com.cyphercove.gdx.flexbatch.utils.SortableBatchable;
 
 /** A Batchable supporting a single {@link PolygonRegion}, with color, position, scale, and an origin offset.
  * 
@@ -40,7 +32,7 @@ public abstract class Poly extends Batchable implements Poolable {
 	protected void addVertexAttributes (Array<VertexAttribute> attributes) {
 		BatchablePreparation.addBaseAttributes(attributes, getNumberOfTextures(), isPosition3D(), isTextureCoordinate3D());
 	}
-	
+
 	protected final int getNumberOfTextures () {
 		return 1;
 	}
@@ -51,8 +43,8 @@ public abstract class Poly extends Batchable implements Poolable {
 	 * Overriding this method will produce a subclass that is incompatible with a FlexBatch that was instantiated for the
 	 * superclass type. */
 	protected abstract boolean isPosition3D ();
-	
-	/** Determines whether the texture coordinate data has a third component (for TextureArray layers). Must return the same 
+
+	/** Determines whether the texture coordinate data has a third component (for TextureArray layers). Must return the same
 	 * constant value for every instance of the class.
 	 * <p>
 	 * Overriding this method will produce a subclass that is incompatible with a FlexBatch that was instantiated for the
@@ -61,14 +53,13 @@ public abstract class Poly extends Batchable implements Poolable {
 
 	protected boolean prepareContext (RenderContextAccumulator renderContext, int remainingVertices, int remainingIndices) {
 		boolean textureChanged = false;
-		if (region != null)
-			textureChanged |= renderContext.setTextureUnit(region.getRegion().getTexture(), 0);
+		if (region != null) textureChanged |= renderContext.setTextureUnit(region.getRegion().getTexture(), 0);
 
 		return textureChanged || remainingVertices < numVertices || remainingIndices < numIndices;
 	}
 
 	public void refresh () { // Does not reset textures, in the interest of speed. There is no need for the concept of default
-									// textures.
+										// textures.
 		x = y = originX = originY = 0;
 		scaleX = scaleY = 1;
 		color = WHITE;
@@ -101,7 +92,7 @@ public abstract class Poly extends Batchable implements Poolable {
 
 	/** Sets the center point for transformations (rotation and scale). For {@link Quad2D}, this is relative to the bottom left
 	 * corner of the texture region. For {@link Quad3D}, this is relative to the center of the texture region and is in the local
-	 * coordinate system. 
+	 * coordinate system.
 	 * @return This object for chaining. */
 	public Poly origin (float originX, float originY) {
 		this.originX = originX;
@@ -138,7 +129,6 @@ public abstract class Poly extends Batchable implements Poolable {
 			width = tRegion.getRegionWidth();
 			height = tRegion.getRegionHeight();
 		}
-		final float[] regionVertices = region.getVertices();
 
 		float color = this.color;
 		for (int i = 0, v = vertexStartingIndex + offsets.color0; i < numVertices; i++, v += vertexSize) {
@@ -146,17 +136,18 @@ public abstract class Poly extends Batchable implements Poolable {
 		}
 
 		float[] textureCoords = region.getTextureCoords();
-		for (int i = 0, v = vertexStartingIndex + offsets.textureCoordinate0, n = textureCoords.length; i < n; i += 2, v += vertexSize) {
+		for (int i = 0, v = vertexStartingIndex
+			+ offsets.textureCoordinate0, n = textureCoords.length; i < n; i += 2, v += vertexSize) {
 			vertices[v] = textureCoords[i];
 			vertices[v + 1] = textureCoords[i + 1];
 		}
-		
-		return 0; //handled by subclass
+
+		return 0; // handled by subclass
 	}
 
 	protected int apply (short[] triangles, int triangleStartingIndex, short firstVertex) {
 		short[] regionTriangles = region.getTriangles();
-		for (int i = 0; i < regionTriangles.length; i++){
+		for (int i = 0; i < regionTriangles.length; i++) {
 			triangles[triangleStartingIndex++] = (short)(regionTriangles[i] + firstVertex);
 		}
 		return numIndices;

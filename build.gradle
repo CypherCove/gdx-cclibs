@@ -19,10 +19,10 @@ allprojects {
   apply plugin: 'nebula.provided-base'
 
   ext {
-    projectVersion = '0.1'
+    projectVersion = '1.0'
     gdxVersion = '1.9.5'
     isSnapshot = '-SNAPSHOT'
-    libVersion = "$projectVersion.$gdxVersion$isSnapshot"
+    libVersion = "$projectVersion$isSnapshot"
   }
 }
 
@@ -46,7 +46,7 @@ subprojects {
 
   sourceCompatibility = 1.6
   targetCompatibility = 1.6
-  group = 'com.cyphercove'
+  group = 'com.cyphercove.gdx'
   version = libVersion
   archivesBaseName = projectName
   eclipse.project.name = projectName
@@ -132,24 +132,8 @@ subprojects {
   }
 }
 
-// Invokes 'build' and 'install' tasks on all projects in the correct order.
-// Prefer this over 'gradle build install' when changing the version of library.
-task installAll(dependsOn: ['installBase', 'lml-vis:build', 'lml-vis:install',
-  'mvc:build', 'mvc:install', 'autumn/natives/android:build',
-  'autumn/natives/android:install', 'autumn/natives/fcs:build',
-  'autumn/natives/fcs:install', 'autumn/natives/gwt:build',
-  'autumn/natives/gwt:install', 'websocket/natives/common:build',
-  'websocket/natives/common:install', 'websocket/natives/gwt:build',
-  'websocket/natives/gwt:install', 'websocket/natives/serialization:build',
-  'websocket/natives/serialization:install', 'lml-uedi:build',
-  'lml-uedi:install']) 
-task installBase(dependsOn: ['installKiwi', 'lml:build', 'lml:install',
-  'autumn:build', 'autumn:install', 'websocket:build', 'websocket:install',
-  'uedi:build', 'uedi:install'])
-task installKiwi(dependsOn: ['kiwi:build', 'kiwi:install'])
-
 nexusStaging {
-  packageGroup = 'com.cyphercove'
+  packageGroup = 'com.cyphercove.gdx'
   username = ossrhUsername
   password = ossrhPassword
 }

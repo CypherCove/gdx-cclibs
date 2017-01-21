@@ -1,63 +1,63 @@
+
 package com.cyphercove.gdx.flexbatch;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Affine2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.cyphercove.gdx.flexbatch.batchable.Quad2D;
 import com.cyphercove.gdx.flexbatch.utils.BatchablePreparation;
 
-import static com.badlogic.gdx.graphics.g2d.Batch.*;
-
-/** A {@link FlexBatch} that implements the {@link Batch} interface, so it is compatible with {@link Stage}/{@link Actor}, 
- * {@link BitmapFont}, {@link ParticleEffect}, and {@link Sprite}. It creates its own default ShaderProgram, which is owned 
- * and is disposed automatically with the CompliantBatch.
+/** A {@link FlexBatch} that implements the {@link Batch} interface, so it is compatible with Stage/Actor, BitmapFont,
+ * ParticleEffect, Sprite, and NinePatch. It creates its own default ShaderProgram, which is owned and is disposed automatically
+ * with the CompliantBatch.
  * <p>
- * In addition to drawing Quad2Ds (or given subclass), if polygon support is specified in the constructor, it may also draw 
- * Poly2Ds (or matching subclass) by submitting them to {@link #draw(Batchable)}.*/
+ * A CompliantBatch must be {@link #dispose() disposed of} when no longer used to avoid leaking memory.
+ * <p>
+ * In addition to drawing Quad2Ds (or given subclass), if polygon support is specified in the constructor, it may also draw
+ * Poly2Ds (or matching subclass) by submitting them to {@link #draw(Batchable)}.
+ * <p>
+ * A subclass of Quad2D may be passed to the constructor to customize what is drawn (multi-texturing or other attributes).
+ * 
+ * @param <T> The type of Quad2D that is returned when acquiring one with {@link #draw()}. This must match the class type that is
+ *           passed to the constructor.
+ * @author cypherdare */
 public class CompliantBatch<T extends Quad2D> extends FlexBatch<T> implements Batch {
 	private final T tmp;
 	private final ShaderProgram defaultShader;
 	private float color = Color.WHITE.toFloatBits();
 	private final Color tempColor = new Color();
 	private final float[] tempVertices = new float[20];
-	
-	/** Constructs a CompliantQuadBatch with a default shader and a capacity of 1000 quads that can be
-	 * drawn per flush. The default shader is owned by the CompliantQuadBatch, so it is disposed when the 
-	 * CompliantQuadBatch is disposed. If an alternate shader has been applied with {@link #setShader(ShaderProgram)}, 
-	 * the default can be used again by setting the shader to null. 
-	 * @param supportPolygons Whether Poly2Ds are supported for drawing. The FlexBatch will not be optimized
-	 * for FixedSizeBatchables. */
+
+	/** Constructs a CompliantQuadBatch with a default shader and a capacity of 1000 quads that can be drawn per flush. The default
+	 * shader is owned by the CompliantQuadBatch, so it is disposed when the CompliantQuadBatch is disposed. If an alternate shader
+	 * has been applied with {@link #setShader(ShaderProgram)}, the default can be used again by setting the shader to null.
+	 * @param supportPolygons Whether Poly2Ds are supported for drawing. The FlexBatch will not be optimized for
+	 *           FixedSizeBatchables. */
 	public CompliantBatch (Class<T> batchableType, boolean supportPolygons) {
 		this(batchableType, 4000, supportPolygons);
 	}
-	
-	/** Constructs a CompliantQuadBatch with a default shader. The default shader is owned by the CompliantQuadBatch, so it is 
-	 * disposed when the CompliantQuadBatch is disposed. If an alternate shader has been applied with 
-	 * {@link #setShader(ShaderProgram)}, the default can be used again by setting the shader to null. 
+
+	/** Constructs a CompliantQuadBatch with a default shader. The default shader is owned by the CompliantQuadBatch, so it is
+	 * disposed when the CompliantQuadBatch is disposed. If an alternate shader has been applied with
+	 * {@link #setShader(ShaderProgram)}, the default can be used again by setting the shader to null.
 	 * @param maxVertices The number of vertices this FlexBatch can batch at once. Maximum of 32767.
-	 * @param supportPolygons Whether Poly2Ds are supported for drawing. The FlexBatch will not be optimized
-	 * for FixedSizeBatchables. */
+	 * @param supportPolygons Whether Poly2Ds are supported for drawing. The FlexBatch will not be optimized for
+	 *           FixedSizeBatchables. */
 	public CompliantBatch (Class<T> batchableType, int maxVertices, boolean supportPolygons) {
 		this(batchableType, maxVertices, true, supportPolygons);
 	}
 
 	/** Constructs a CompliantQuadBatch with a specified capacity and optional default shader.
 	 * @param maxVertices The number of vertices this FlexBatch can batch at once. Maximum of 32767.
-	 * @param generateDefaultShader Whether a default shader should be created. The default shader
-	 * is owned by the CompliantQuadBatch, so it is disposed when the CompliantQuadBatch is disposed. If an
-	 * alternate shader has been applied with {@link #setShader(ShaderProgram)}, the default can be
-	 * used again by setting the shader to null. 
-	 * @param supportPolygons Whether Poly2Ds are supported for drawing. The FlexBatch will not be optimized
-	 * for FixedSizeBatchables. */
+	 * @param generateDefaultShader Whether a default shader should be created. The default shader is owned by the
+	 *           CompliantQuadBatch, so it is disposed when the CompliantQuadBatch is disposed. If an alternate shader has been
+	 *           applied with {@link #setShader(ShaderProgram)}, the default can be used again by setting the shader to null.
+	 * @param supportPolygons Whether Poly2Ds are supported for drawing. The FlexBatch will not be optimized for
+	 *           FixedSizeBatchables. */
 	public CompliantBatch (Class<T> batchableType, int maxVertices, boolean generateDefaultShader, boolean supportPolygons) {
 		super(batchableType, maxVertices, supportPolygons ? maxVertices * 2 : 0);
 		try {
@@ -65,53 +65,47 @@ public class CompliantBatch<T extends Quad2D> extends FlexBatch<T> implements Ba
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Batchable classes must be public and have an empty constructor.", e);
 		}
-		if (generateDefaultShader){
-			defaultShader = 
-				new ShaderProgram(BatchablePreparation.generateGenericVertexShader(1), BatchablePreparation.generateGenericFragmentShader(1));
-			if (defaultShader.isCompiled() == false) throw new IllegalArgumentException("Error compiling shader: " + defaultShader.getLog());
+		if (generateDefaultShader) {
+			defaultShader = new ShaderProgram(BatchablePreparation.generateGenericVertexShader(1),
+				BatchablePreparation.generateGenericFragmentShader(1));
+			if (defaultShader.isCompiled() == false)
+				throw new IllegalArgumentException("Error compiling shader: " + defaultShader.getLog());
 			setShader(defaultShader);
 		} else {
 			defaultShader = null;
 		}
 	}
-	
+
 	@Override
-	public void setShader (ShaderProgram shader){
-		if (shader == null) 
-			shader = defaultShader;
+	public void setShader (ShaderProgram shader) {
+		if (shader == null) shader = defaultShader;
 		super.setShader(shader);
 	}
-	
+
 	@Override
-	public void dispose (){
+	public void dispose () {
 		super.dispose();
-		if (defaultShader != null)
-			defaultShader.dispose();
+		if (defaultShader != null) defaultShader.dispose();
 	}
 
-	/**
-	 * Sets the color used to tint images when they are added to the Batch. Default is Color.WHITE. Does not
-	 * affect the color of anything drawn with {@link #draw()}, {@link #draw(Batchable)}, or {@link #draw(Texture, float[], int, int)}.
-	 */
+	/** Sets the color used to tint images when they are added to the Batch. Default is Color.WHITE. Does not affect the color of
+	 * anything drawn with {@link #draw()}, {@link #draw(Batchable)}, or {@link #draw(Texture, float[], int, int)}. */
 	@Override
 	public void setColor (Color tint) {
 		color = tint.toFloatBits();
 	}
 
-	/**
-	 * Sets the color used to tint images when they are added to the Batch. Default is equivalent to Color.WHITE. Does not
-	 * affect the color of anything drawn with {@link #draw()}, {@link #draw(Batchable)}, or {@link #draw(Texture, float[], int, int)}.
-	 */
+	/** Sets the color used to tint images when they are added to the Batch. Default is equivalent to Color.WHITE. Does not affect
+	 * the color of anything drawn with {@link #draw()}, {@link #draw(Batchable)}, or {@link #draw(Texture, float[], int, int)}. */
 	@Override
 	public void setColor (float r, float g, float b, float a) {
 		int intBits = (int)(255 * a) << 24 | (int)(255 * b) << 16 | (int)(255 * g) << 8 | (int)(255 * r);
 		color = NumberUtils.intToFloatColor(intBits);
 	}
 
-	/**
-	 * Sets the color used to tint images when they are added to the Batch. Default is {@link Color#toFloatBits() Color.WHITE.toFloatBits()}. Does not
-	 * affect the color of anything drawn with {@link #draw()}, {@link #draw(Batchable)}, or {@link #draw(Texture, float[], int, int)}.
-	 */
+	/** Sets the color used to tint images when they are added to the Batch. Default is {@link Color#toFloatBits()
+	 * Color.WHITE.toFloatBits()}. Does not affect the color of anything drawn with {@link #draw()}, {@link #draw(Batchable)}, or
+	 * {@link #draw(Texture, float[], int, int)}. */
 	@Override
 	public void setColor (float color) {
 		this.color = color;
@@ -132,7 +126,7 @@ public class CompliantBatch<T extends Quad2D> extends FlexBatch<T> implements Ba
 	public float getPackedColor () {
 		return color;
 	}
-	
+
 	@Override
 	public void draw (Texture texture, float[] spriteVertices, int offset, int count) {
 		tmp.refresh();
@@ -227,13 +221,13 @@ public class CompliantBatch<T extends Quad2D> extends FlexBatch<T> implements Ba
 		vertices[V3] = region.getV();
 		vertices[U4] = region.getU2();
 		vertices[V4] = region.getV2();
-		
+
 		float color = this.color;
 		vertices[C1] = color;
 		vertices[C2] = color;
 		vertices[C3] = color;
 		vertices[C4] = color;
-		
+
 		// construct corner points
 		vertices[X1] = transform.m02;
 		vertices[Y1] = transform.m12;
@@ -243,8 +237,8 @@ public class CompliantBatch<T extends Quad2D> extends FlexBatch<T> implements Ba
 		vertices[Y3] = transform.m10 * width + transform.m11 * height + transform.m12;
 		vertices[X4] = transform.m00 * width + transform.m02;
 		vertices[Y4] = transform.m10 * width + transform.m12;
-		
+
 		draw(region.getTexture(), vertices, 0, 20);
 	}
-	
+
 }

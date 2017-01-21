@@ -4,27 +4,22 @@ package com.cyphercove.gdx.flexbatch.batchable;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GLTexture;
 import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
-import com.cyphercove.gdx.flexbatch.Batchable;
 import com.cyphercove.gdx.flexbatch.Batchable.FixedSizeBatchable;
 import com.cyphercove.gdx.flexbatch.utils.AttributeOffsets;
 import com.cyphercove.gdx.flexbatch.utils.BatchablePreparation;
 import com.cyphercove.gdx.flexbatch.utils.Region2D;
 import com.cyphercove.gdx.flexbatch.utils.RenderContextAccumulator;
-import com.cyphercove.gdx.flexbatch.utils.SortableBatchable;
 
 /** A Batchable representing a rectangle and supporting zero or more Textures/TextureRegions, and supporting color, position,
  * scale, and an origin offset.
  * <p>
- * By default, one texture is used. It may be subclassed to create a Batchable class that supports zero or multiple textures and 
- * additional attributes--see {@link #getNumberOfTextures()} and {@link #addVertexAttributes(com.badlogic.gdx.utils.Array) 
+ * By default, one texture is used. It may be subclassed to create a Batchable class that supports zero or multiple textures and
+ * additional attributes--see {@link #getNumberOfTextures()} and {@link #addVertexAttributes(com.badlogic.gdx.utils.Array)
  * addVertexAttributes()}.
  * <p>
  * A Quad has fixed size, so its indices do not need to be recalculated for every draw call.
@@ -59,15 +54,15 @@ public abstract class Quad extends FixedSizeBatchable implements Poolable {
 	protected final int getTrianglesPerBatchable () {
 		return 2;
 	}
-	
-	protected final int getVerticesPerBatchable (){
+
+	protected final int getVerticesPerBatchable () {
 		return 4;
 	}
 
 	protected void addVertexAttributes (Array<VertexAttribute> attributes) {
 		BatchablePreparation.addBaseAttributes(attributes, getNumberOfTextures(), isPosition3D(), isTextureCoordinate3D());
 	}
-	
+
 	protected int getNumberOfTextures () {
 		return 1;
 	}
@@ -78,8 +73,8 @@ public abstract class Quad extends FixedSizeBatchable implements Poolable {
 	 * Overriding this method will produce a subclass that is incompatible with a FlexBatch that was instantiated for the
 	 * superclass type. */
 	protected abstract boolean isPosition3D ();
-	
-	/** Determines whether the texture coordinate data has a third component (for TextureArray layers). Must return the same 
+
+	/** Determines whether the texture coordinate data has a third component (for TextureArray layers). Must return the same
 	 * constant value for every instance of the class.
 	 * <p>
 	 * Overriding this method will produce a subclass that is incompatible with a FlexBatch that was instantiated for the
@@ -91,12 +86,12 @@ public abstract class Quad extends FixedSizeBatchable implements Poolable {
 		for (int i = 0; i < textures.length; i++) {
 			textureChanged |= renderContext.setTextureUnit(textures[i], i);
 		}
-		
+
 		return textureChanged || remainingVertices < 4;
 	}
 
 	public void refresh () { // Does not reset textures, in the interest of speed. There is no need for the concept of default
-									// textures.
+										// textures.
 		x = y = originX = originY = 0;
 		coordinatesRotation = 0;
 		scaleX = scaleY = 1;
@@ -145,8 +140,8 @@ public abstract class Quad extends FixedSizeBatchable implements Poolable {
 	}
 
 	/** Sets the UV region of the most recently applied texture, using texel units. This must be called after a Texture or
-	 * TextureRegion has been set with {@link #texture(GLTexture)} or {@link #textureRegion(TextureRegion)}. Note that TextureRegions
-	 * have a Y-down coordinate system for UVs.
+	 * TextureRegion has been set with {@link #texture(GLTexture)} or {@link #textureRegion(TextureRegion)}. Note that
+	 * TextureRegions have a Y-down coordinate system for UVs.
 	 * <p>
 	 * This method must not be called in a Batchable that supports zero textures.
 	 * @param x The left side of the region.
@@ -173,8 +168,8 @@ public abstract class Quad extends FixedSizeBatchable implements Poolable {
 		return this;
 	}
 
-	/** Flips the UV region of the most recently applied texture. This must be called after a texture or region has been set
-	 * with {@link #texture(GLTexture)} or {@link #textureRegion(TextureRegion)}.
+	/** Flips the UV region of the most recently applied texture. This must be called after a texture or region has been set with
+	 * {@link #texture(GLTexture)} or {@link #textureRegion(TextureRegion)}.
 	 * @return This object for chaining. */
 	public Quad flip (boolean flipX, boolean flipY) {
 		regions[regionIndex].flip(flipX, flipY);
@@ -200,7 +195,7 @@ public abstract class Quad extends FixedSizeBatchable implements Poolable {
 
 	/** Sets the center point for transformations (rotation and scale). For {@link Quad2D}, this is relative to the bottom left
 	 * corner of the texture region. For {@link Quad3D}, this is relative to the center of the texture region and is in the local
-	 * coordinate system. 
+	 * coordinate system.
 	 * @return This object for chaining. */
 	public Quad origin (float originX, float originY) {
 		this.originX = originX;
@@ -208,7 +203,7 @@ public abstract class Quad extends FixedSizeBatchable implements Poolable {
 		return this;
 	}
 
-	/** Rotates the texture region(s) 90 degrees in place by rotating the texture coordinates. 
+	/** Rotates the texture region(s) 90 degrees in place by rotating the texture coordinates.
 	 * @return This object for chaining. */
 	public Quad rotateCoordinates90 (boolean clockwise) {
 		coordinatesRotation += clockwise ? 1 : 3;
@@ -256,7 +251,7 @@ public abstract class Quad extends FixedSizeBatchable implements Poolable {
 
 		int tci = vertexStartingIndex + offsets.textureCoordinate0;
 		int tcSize = isTextureCoordinate3D() ? 3 : 2;
-		
+
 		switch (coordinatesRotation % 4) {
 		case 0:
 			for (int i = 0; i < regions.length; i++) {
@@ -354,8 +349,8 @@ public abstract class Quad extends FixedSizeBatchable implements Poolable {
 			}
 			break;
 		}
-		
-		if (isTextureCoordinate3D()){
+
+		if (isTextureCoordinate3D()) {
 			int tci3 = ci + 3;
 			for (int i = 0; i < regions.length; i++) {
 				Region2D region = regions[i];
