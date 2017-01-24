@@ -2,7 +2,7 @@
 FlexBatch is a library for LibGDX used for batching many small custom objects optimally. It can be used as a flexible version of SpriteBatch, but where the sprites can have custom parameters, multi-texturing, bump-mapped lighting, etc. It can also be used for small objects in 3D (for example, a flexible version of DecalBatch).
 
 ## Project Dependency
-A Maven Central project is coming within days. Until then, you must clone this project and build it. If you use the command `gradle install`, it will be placed in your local Maven repo, and you can add it to your LibGDX project's base `build.gradle` under the `core` module's dependencies:
+FlexBatch is available via Maven Central. The first version isn't yet released, so there is only the 1.0-SNAPSHOT. You can add it to your LibGDX project's base `build.gradle` under the `core` module's dependencies:
 
     compile "com.cyphercove.gdx:flexbatch:1.0-SNAPSHOT"
     
@@ -117,7 +117,7 @@ A bump-mapped quad probably needs to pass its angle to the shader so a binormal 
 For an example of a bump mapped quad and matching shader, see the `FlexBatchExamplesMain` class in the examples in the source code.
 
 ### Quad3D
-**Quad3D** is analogous to a Decal in LibGDX, but it can be customized with additional textures and vertex attributes, much like Quad2D. It is designed for positioning in 3D space relative to the center of the quadrangle. It has some convenience methods for
+**Quad3D** is analogous to a Decal in LibGDX, but it can be customized with additional textures and vertex attributes, much like Quad2D. It is designed for positioning in 3D space relative to the center of the quadrangle. It has some convenience methods for modifying its rotation in relation to a camera.
 
 Its primary difference with Quad2D is that it also has parameters for opaqueness and blend function and causes the FlexBatch to automatically toggle blending and set blend function parameters as appropriate, flushing before changes. This is because non-opaque quads in 3D space must be sorted far-to-near for drawing. Typically, opaque quads should all be drawn before transparent quads.
 
