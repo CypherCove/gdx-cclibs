@@ -1,5 +1,5 @@
 # Cypher Cove libraries for [LibGDX](https://github.com/libgdx/libgdx)
-This repository contains libraries for use with the LibGDX framework. Currently the only included library is [FlexBatch](flexbatch).
+This repository contains libraries for use with the LibGDX framework.
 
 ## Libraries
 
