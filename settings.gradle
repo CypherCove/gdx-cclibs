@@ -1,1 +1,1 @@
-include 'flexbatch'
+include 'flexbatch', 'covetools'

@@ -1,6 +1,16 @@
 # Cypher Cove libraries for [LibGDX](https://github.com/libgdx/libgdx)
 This repository contains libraries for use with the LibGDX framework. Currently the only included library is [FlexBatch](flexbatch).
 
+## Libraries
+
+### [FlexBatch](flexbatch)
+
+A library for for batching many small custom objects optimally. It can be used as a flexible version of SpriteBatch, but where the sprites can have custom parameters, multi-texturing, bump-mapped lighting, etc.
+
+### [Cove Tools](covetools)
+
+A library containing utility classes, including AssignmentAssetManager, which allows assets to be specified, loaded, and referenced with very little code.
+
 ## Working with the sources
 This project's Gradle files are based on those in the [gdx-lml project](https://github.com/czyzby/gdx-lml) by [czyzby](https://github.com/czyzby/). The below explanation is originally from that project.
 
