@@ -50,6 +50,10 @@ public class AssignmentAssetManagerTest extends Example {
     Stage2Assets stage2Assets = new Stage2Assets();
     GameStage gameStage;
     
+    static TextureParameter mipmapParams = new TextureParameter(){{
+		genMipMaps = true;
+	}};
+    
     private enum GameStage {
     	Stage1, Stage2
     }
@@ -59,13 +63,8 @@ public class AssignmentAssetManagerTest extends Example {
         @Asset("arial-32.fnt") public BitmapFont font;
     }
 
-	@SuppressWarnings("unused")
     private static class Stage1Assets {
-		TextureParameter mipmapParams = new TextureParameter(){{
-    		genMipMaps = true;
-    	}};
-    	
-        @Asset(value = "egg.png", parameter = "mipmapParams") public Texture eggTexture;
+        @Asset(value = "egg.png", parameter = "com.cyphercove.gdx.examples.AssignmentAssetManagerTest.mipmapParams") public Texture eggTexture;
         @Asset("tree.png") public Texture treeTexture;
         @Asset("pack") public TextureAtlas atlas;
         @Assets({"arial-15.fnt", "arial-32.fnt", "arial-32-pad.fnt"}) public BitmapFont[] fonts;

@@ -190,6 +190,27 @@ public class AssignmentAssetManager extends AssetManager {
 	private AssetLoaderParameters<?> findParameter (Object container, Field[] containerFields, String parameterFieldName, String annotatedFieldName){
 		if (parameterFieldName == null || parameterFieldName.equals(""))
 			return null;
+		
+		Field parameterField = null;
+		
+		if (parameterFieldName.contains(".")){ // assume fully qualified, statically accessed
+			int lastDotIndex = parameterFieldName.lastIndexOf(".");
+			String className = parameterFieldName.substring(0, lastDotIndex);
+			parameterFieldName = parameterFieldName.substring(lastDotIndex + 1, parameterFieldName.length());
+			try {
+				Class<?> parameterContainerClass = ClassReflection.forName(className);
+				parameterField = ClassReflection.getDeclaredField(parameterContainerClass, parameterFieldName);
+				makeAccessible(parameterField);
+				AssetLoaderParameters<?> parameter = (AssetLoaderParameters<?>) parameterField.get(null);
+				if (parameter == null){
+					throw new GdxRuntimeException(String.format("The specified parameter %s for asset %s cannot be null.", parameterFieldName, annotatedFieldName));
+				}
+				return parameter;
+			} catch (ReflectionException e) {
+				throw new GdxRuntimeException(String.format("Cannot retrieve parameter field %s of fully qualified class %s.", parameterFieldName, className));
+			}
+		}
+		
 		for (Field field : containerFields){
 			if (field.getName().equals(parameterFieldName)){
 				makeAccessible(field);
@@ -284,7 +305,8 @@ public class AssignmentAssetManager extends AssetManager {
 	/**
 	 * Annotation for a field to be populated with a reference to the specified asset. A path for the asset must be provided. An
 	 * AssetManagerParameters may be provided using {@link Assets#parameter()}. Parameters are specified by field name, and should already be
-	 * populated before loading.
+	 * populated before loading. The parameter field is assumed to be in the same class as the asset, unless a fully qualified name is given
+	 * for a static field.
 	 */
 	@Documented
 	@Retention(RetentionPolicy.RUNTIME)
@@ -298,7 +320,8 @@ public class AssignmentAssetManager extends AssetManager {
 	 * Annotation for an array field to be populated with references to the assets. An array of asset paths must be provided. A single shared
 	 * AssetManagerParameters may be provided using {@link Assets#parameter()}, or an array of an array of AssetManagerParameters may be 
 	 * specified using {@link Assets#parameters()} (array sizes must match). Parameters are specified by field name, and should already be
-	 * populated before loading.
+	 * populated before loading. The parameter field is assumed to be in the same class as the asset, unless a fully qualified name is given for 
+	 * a static field.
 	 */
 	@Documented
 	@Retention(RetentionPolicy.RUNTIME)

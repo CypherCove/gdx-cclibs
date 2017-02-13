@@ -43,6 +43,8 @@ You can also specify an AssetLoader parameter by field name in the annotation:
         @Asset(value = "egg.png", parameter = "mipmapParams") public Texture eggTexture;
 	}
 	
+The parameter must be a field of the container class, or can be a static member of any class if a fully qualified name is given.
+
 Finally, you can optionally implement the AssetContainer interface to specify a directory for all the assets, or to get a callback once they're loaded and assigned:
 
     private static class Stage1Assets implements AssetContainer {
