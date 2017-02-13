@@ -2,10 +2,11 @@
 This is a set of tools I use to speed up some tasks in LibGDX.
 
 ## Project Dependency
-
-This library is an infant. After I expand it a bit, I'll put it on Maven Central. Until then, you can copy-paste classes, or you can clone this project, and call `gradle install` to compile it into your local Maven. Then you can reference this dependency:
+Cove Tools is available via Maven Central. The first version isn't yet released, so there is only the 1.0-SNAPSHOT. You can add it to your LibGDX project's base `build.gradle` under the `core` module's dependencies:
 
     compile "com.cyphercove.gdx:covetools:1.0-SNAPSHOT"
+    
+Cove Tools is compatible with LibGDX 1.9.5+. The SNAPSHOT version will be kept up-to-date with any breaking changes in the LibGDX SNAPSHOT as quickly as possible.
 
 ## AssignmentAssetManager
 
