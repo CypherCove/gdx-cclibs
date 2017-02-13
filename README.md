@@ -7,7 +7,7 @@ This repository contains libraries for use with the LibGDX framework.
 
 A library for for batching many small custom objects optimally. It can be used as a flexible version of SpriteBatch, but where the sprites can have custom parameters, multi-texturing, bump-mapped lighting, etc.
 
-### [Cove Tools](covetools)
+### [CoveTools](covetools)
 
 A library containing utility classes, including AssignmentAssetManager, which allows assets to be specified, loaded, and referenced with very little code.
 

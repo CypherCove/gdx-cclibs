@@ -1,8 +1,8 @@
 # CoveTools
-This is a set of tools I use to speed up some tasks in LibGDX.
+This is a set of utilities I use with LibGDX.
 
 ## Project Dependency
-Cove Tools is available via Maven Central. The first version isn't yet released, so there is only the 1.0-SNAPSHOT. You can add it to your LibGDX project's base `build.gradle` under the `core` module's dependencies:
+CoveTools is available via Maven Central. The first version isn't yet released, so there is only the 1.0-SNAPSHOT. You can add it to your LibGDX project's base `build.gradle` under the `core` module's dependencies:
 
     compile "com.cyphercove.gdx:covetools:1.0-SNAPSHOT"
     
