@@ -16,6 +16,7 @@
 package com.cyphercove.gdx.covetools.tween.tweens;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.cyphercove.gdx.covetools.tween.tweens.ParameterTarget;
 
 /** Wrapper for tween parameter target that is an Actor, so the various parameters can be distinguished
  * for interruption purposes.
@@ -30,7 +31,7 @@ public abstract class ActorTarget implements ParameterTarget<ActorTarget> {
 		Position, Scale, Rotation, Origin, Size, Bounds, Color
 	}
 	
-	public void applyRotation (float rotation){
+	public void applyX (float rotation){
 		actor.setRotation(rotation);
 	}
 	
@@ -53,12 +54,17 @@ public abstract class ActorTarget implements ParameterTarget<ActorTarget> {
 		}
 	}
 	
-	public void applyColor (float r, float g, float b, float a){
-		actor.setColor(r, g, b, a);
-	}
-	
-	public void applyBounds (float x, float y, float width, float height){
-		actor.setBounds(x, y, width, height);
+	public void applyXYZW (float x, float y, float z, float w){
+		switch (parameter) {
+		case Color:
+			actor.setColor(x, y, z, w);
+			break;
+		case Bounds:
+			actor.setBounds(x, y, z, w);
+			break;
+		default:
+			break;
+		}
 	}
 	
 	public boolean matches (ActorTarget other){

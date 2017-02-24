@@ -3,8 +3,10 @@
 <module rename-to="html">
 	<inherits name='com.badlogic.gdx.backends.gdx_backends_gwt' />
 	<inherits name='com.cyphercove.gdx.Examples' />
+	<inherits name='com.cyphercove.gdx.covetools.CoveTools' />
+	<inherits name='com.cyphercove.gdx.flexbatch.FlexBatch' />
 	<inherits name='Examples' />
-	<entry-point class='com.cyphercove.gdx.flexbatch.examples.client.HtmlLauncher' />
+	<entry-point class='com.cyphercove.gdx.examples.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 	<set-configuration-property name="gdx.assetpath" value="../android/assets" />
 </module>
