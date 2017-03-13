@@ -2,9 +2,13 @@
 FlexBatch is a library for LibGDX used for batching many small custom objects optimally. It can be used as a flexible version of SpriteBatch, but where the sprites can have custom parameters, multi-texturing, bump-mapped lighting, etc. It can also be used for small objects in 3D (for example, a flexible version of DecalBatch).
 
 ## Project Dependency
-FlexBatch is available via Maven Central. The first version isn't yet released, so there is only the 1.0-SNAPSHOT. You can add it to your LibGDX project's base `build.gradle` under the `core` module's dependencies:
+FlexBatch is available via Maven Central. You can add it to your LibGDX project's base `build.gradle` under the `core` module's dependencies:
 
-    compile "com.cyphercove.gdx:flexbatch:1.0-SNAPSHOT"
+    compile "com.cyphercove.gdx:flexbatch:1.0"
+    
+or
+
+    compile "com.cyphercove.gdx:flexbatch:1.1-SNAPSHOT"
     
 FlexBatch is compatible with LibGDX 1.9.5+. The SNAPSHOT version will be kept up-to-date with any breaking changes in the LibGDX SNAPSHOT as quickly as possible.
 

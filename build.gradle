@@ -20,8 +20,8 @@ allprojects {
 
   ext {
     projectVersion = '1.0'
-    gdxVersion = '1.9.5'
-    isSnapshot = '-SNAPSHOT'
+    gdxVersion = '1.9.6'
+    isSnapshot = ''
     libVersion = "$projectVersion$isSnapshot"
   }
 }
@@ -124,6 +124,14 @@ subprojects {
           organization {
           	name 'Cypher Cove'
           	url 'www.cyphercove.com'
+          }
+          
+          developers {
+            developer {
+              id 'cypherdare'
+              name 'Darren'
+              email 'contact@cyphercove.com'
+            }
           }
 
         }
