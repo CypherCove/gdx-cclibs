@@ -1,1 +1,1 @@
-include 'flexbatch', 'covetools'
+include 'flexbatch', 'covetools', 'gdxtokryo'
