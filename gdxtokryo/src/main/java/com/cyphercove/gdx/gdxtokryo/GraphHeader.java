@@ -130,7 +130,7 @@ public class GraphHeader<T> implements KryoSerializable{
      * If there are multiple types of object graphs in this application that share some serializers, the data version used
      * is shared by all, so it should be incremented if any serializers across all of possible graphs is changed.
      * <p>
-     * Default is 0. Must be >= 0. The correct value must be set before writing any objects. When the object graph is
+     * Default is 0. Must be &gt;= 0. The correct value must be set before writing any objects. When the object graph is
      * being read, custom serializers can access the data version that was used to write the data using
      * {@link GraphHeader#getWrittenVersion(Kryo)} in their <code>read</code> methods.
      */
@@ -167,8 +167,8 @@ public class GraphHeader<T> implements KryoSerializable{
      */
     public boolean useCompactColor = true;
 
-    /**Whether Pixmap drawing parameters (i.e. {@link Pixmap#setColor(Color)}, {@link Pixmap#getBlending()}, and
-     * {@link Pixmap#getFilter()}) should be written and restored when read or copied. */
+    /**Whether Pixmap drawing parameters (i.e. {@link Pixmap#setColor(Color)}, {@link Pixmap#getBlending()}) should be
+     * written and restored when read or copied. */
     public boolean includePixmapDrawingParams = false;
 
     /** The top level object of the object graph. */

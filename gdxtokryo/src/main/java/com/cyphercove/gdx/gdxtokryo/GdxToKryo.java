@@ -44,8 +44,8 @@ public class GdxToKryo {
     public static final Object OBSOLETE_BRANCH_KEY = new Object();
 
     /** Registers {@link GraphHeader} and all of the LibGDX classes supported by GdxToKryo with serializers, using the
-     * next consecutively available IDs in the Kryo instance. The value of <code>groupID</code> must be >=0 and
-     * <{@link #GROUP_COUNT}. To register all of GdxToKryo's serializers, this method should be used repeatedly with all
+     * next consecutively available IDs in the Kryo instance. The value of <code>groupID</code> must be &gt;=0 and
+     * {@link #GROUP_COUNT}. To register all of GdxToKryo's serializers, this method should be used repeatedly with all
      * values in this range.
      * <p>
      * When the GdxToKryo library adds additional serializers, a new group ID will become available for each release

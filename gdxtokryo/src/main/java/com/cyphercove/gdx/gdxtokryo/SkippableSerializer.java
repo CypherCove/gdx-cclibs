@@ -23,7 +23,7 @@ public abstract class SkippableSerializer<T> extends Serializer<T> {
             writeNonNull(kryo, output, object);
     }
 
-    /** Write the object as is usually done with {@link #write(Kryo, Output, T)}. The object will never be null. */
+    /** Write the object as is usually done with {@code #write(Kryo, Output, T)}. The object will never be null. */
     public abstract void writeNonNull (Kryo kryo, Output output, T object);
 
     final public T read (Kryo kryo, Input input, Class<T> type){

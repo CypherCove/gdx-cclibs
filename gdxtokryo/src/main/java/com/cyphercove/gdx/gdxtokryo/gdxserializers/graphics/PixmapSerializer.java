@@ -136,8 +136,8 @@ public class PixmapSerializer extends SkippableSerializer<Pixmap> {
         this.compressionSelector = compressionSelector;
     }
 
-    /** Sets whether drawing parameters (i.e. {@link Pixmap#setColor(Color)}, {@link Pixmap#getBlending()}, and
-     * {@link Pixmap#getFilter()}) should be written and read in the absence of a {@link GraphHeader}. False by default.*/
+    /** Sets whether drawing parameters (i.e. {@link Pixmap#setColor(Color)}, {@link Pixmap#getBlending()}) should be
+     * written and read in the absence of a {@link GraphHeader}. False by default.*/
     public void setIncludeDrawingParamsDefault(boolean includeDrawingParamsDefault) {
         this.isIncludeDrawingParamsDefault = includeDrawingParamsDefault;
     }
