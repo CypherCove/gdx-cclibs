@@ -8,11 +8,11 @@ CoveTools is available via Maven Central. You can add it to your LibGDX project'
     
 or 
 
-    compile "com.cyphercove.gdx:covetools:1.1-SNAPSHOT"
+    compile "com.cyphercove.gdx:covetools:1.1.0-SNAPSHOT"
     
-Cove Tools is compatible with LibGDX 1.9.5+. The SNAPSHOT version will be kept up-to-date with any breaking changes in the LibGDX SNAPSHOT as quickly as possible.
+CoveTools is compatible with LibGDX 1.9.5+. The SNAPSHOT version will be kept up-to-date with any breaking changes in the LibGDX SNAPSHOT as quickly as possible.
 
-Cove Tools does not (yet) support GWT.
+CoveTools does not (yet) support GWT.
 
 ## AssignmentAssetManager
 

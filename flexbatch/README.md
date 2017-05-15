@@ -8,7 +8,7 @@ FlexBatch is available via Maven Central. You can add it to your LibGDX project'
     
 or
 
-    compile "com.cyphercove.gdx:flexbatch:1.1-SNAPSHOT"
+    compile "com.cyphercove.gdx:flexbatch:1.1.0-SNAPSHOT"
     
 FlexBatch is compatible with LibGDX 1.9.5+. The SNAPSHOT version will be kept up-to-date with any breaking changes in the LibGDX SNAPSHOT as quickly as possible.
 
