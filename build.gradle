@@ -19,7 +19,7 @@ allprojects {
   apply plugin: 'nebula.provided-base'
 
   ext {
-    projectVersion = '1.1'
+    projectVersion = '1.1.0'
     gdxVersion = '1.9.7-SNAPSHOT'
     isSnapshot = '-SNAPSHOT'
     libVersion = "$projectVersion$isSnapshot"
@@ -64,7 +64,7 @@ subprojects {
   }
 
   dependencies {
-    provided "com.badlogicgames.gdx:gdx:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     testCompile "junit:junit:$junitVersion"
     deployerJars "org.apache.maven.wagon:wagon-ssh:$wagonVersion"
     deployerJars "org.apache.maven.wagon:wagon-http:$wagonVersion"
