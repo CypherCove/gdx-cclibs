@@ -18,6 +18,7 @@ package com.cyphercove.gdx.gdxtokryo;
 import com.badlogic.gdx.Version;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoSerializable;
 import com.esotericsoftware.kryo.io.Input;
@@ -62,6 +63,34 @@ public class GraphHeader<T> implements KryoSerializable{
     private static final int GRAPH_HEADER_VERSION = 0;
     private static final Object GRAPH_HEADER_KEY = new Object();
 
+    private static void pushHeader (Kryo kryo, GraphHeader graphHeader){
+        Array<GraphHeader> graphHeaders;
+        if (kryo.getGraphContext().containsKey(GRAPH_HEADER_KEY))
+            graphHeaders = (Array<GraphHeader>)kryo.getGraphContext().get(GRAPH_HEADER_KEY);
+        else
+            graphHeaders = new Array<GraphHeader>();
+        graphHeaders.add(graphHeader);
+        kryo.getGraphContext().put(GRAPH_HEADER_KEY, graphHeaders);
+    }
+
+    private static GraphHeader peekHeader (Kryo kryo){
+        if (kryo.getGraphContext().containsKey(GRAPH_HEADER_KEY)) {
+            Array<GraphHeader> graphHeaders = (Array<GraphHeader>)kryo.getGraphContext().get(GRAPH_HEADER_KEY);
+            if (graphHeaders.size > 0)
+                return graphHeaders.peek();
+        }
+        return null;
+    }
+
+    private static GraphHeader popHeader (Kryo kryo){
+        if (kryo.getGraphContext().containsKey(GRAPH_HEADER_KEY)) {
+            Array<GraphHeader> graphHeaders = (Array<GraphHeader>)kryo.getGraphContext().get(GRAPH_HEADER_KEY);
+            if (graphHeaders.size > 0)
+                return graphHeaders.pop();
+        }
+        return null;
+    }
+
     /**
      * If reading an object graph wrapped in an instance of GraphHeader, serializers can call this to obtain the
      * value of {@link #writtenVersion} in that GraphHeader in their <code>read</code> methods.
@@ -70,8 +99,9 @@ public class GraphHeader<T> implements KryoSerializable{
      * a GraphHeader did not wrap the data being read, 0 is returned.
      */
     public static int getWrittenVersion(Kryo kryo){
-        if (kryo.getGraphContext().containsKey(GRAPH_HEADER_KEY))
-            return ((GraphHeader)kryo.getGraphContext().get(GRAPH_HEADER_KEY)).writtenVersion;
+        GraphHeader graphHeader = peekHeader(kryo);
+        if (graphHeader != null)
+            return graphHeader.writtenVersion;
         return currentReadWriteVersion;
     }
 
@@ -85,8 +115,8 @@ public class GraphHeader<T> implements KryoSerializable{
      * that wrote the data.
      */
     public static boolean isWrittenGdxVersionAtLeast (Kryo kryo, int major, int minor, int revision) {
-        if (kryo.getGraphContext().containsKey(GRAPH_HEADER_KEY)){
-            GraphHeader<?> graphHeader = (GraphHeader)kryo.getGraphContext().get(GRAPH_HEADER_KEY);
+        GraphHeader graphHeader = peekHeader(kryo);
+        if (graphHeader != null){
             if (graphHeader.gdxMajorVersion != major)
                 return graphHeader.gdxMajorVersion > major;
             if (graphHeader.gdxMinorVersion != minor)
@@ -104,8 +134,9 @@ public class GraphHeader<T> implements KryoSerializable{
      * If a GraphHeader did not precede the data being written or read, null is returned.
      */
     public static Boolean isUseCompactColor (Kryo kryo){
-        if (kryo.getGraphContext().containsKey(GRAPH_HEADER_KEY))
-            return ((GraphHeader)kryo.getGraphContext().get(GRAPH_HEADER_KEY)).useCompactColor;
+        GraphHeader graphHeader = peekHeader(kryo);
+        if (graphHeader != null)
+            return graphHeader.useCompactColor;
         return null;
     }
 
@@ -117,8 +148,9 @@ public class GraphHeader<T> implements KryoSerializable{
      * the graph. If a GraphHeader did not precede the data being written or read, null is returned.
      */
     public static Boolean isIncludePixmapDrawingParams (Kryo kryo){
-        if (kryo.getGraphContext().containsKey(GRAPH_HEADER_KEY))
-            return ((GraphHeader)kryo.getGraphContext().get(GRAPH_HEADER_KEY)).includePixmapDrawingParams;
+        GraphHeader graphHeader = peekHeader(kryo);
+        if (graphHeader != null)
+            return graphHeader.includePixmapDrawingParams;
         return null;
     }
 
@@ -130,11 +162,11 @@ public class GraphHeader<T> implements KryoSerializable{
      * If there are multiple types of object graphs in this application that share some serializers, the data version used
      * is shared by all, so it should be incremented if any serializers across all of possible graphs is changed.
      * <p>
-     * Default is 0. Must be &gt;= 0. The correct value must be set before writing any objects. When the object graph is
+     * Default is -1. Must be &gt;= 0. The correct value must be set before writing any objects. When the object graph is
      * being read, custom serializers can access the data version that was used to write the data using
      * {@link GraphHeader#getWrittenVersion(Kryo)} in their <code>read</code> methods.
      */
-    public static int currentReadWriteVersion;
+    public static int currentReadWriteVersion = -1;
 
     // Gdx version fields are only relevant during reading of the graph.
     int gdxMajorVersion, gdxMinorVersion, gdxRevisionVersion;
@@ -182,12 +214,15 @@ public class GraphHeader<T> implements KryoSerializable{
 
     @Override
     public final void write (Kryo kryo, Output output) {
-        Class type = data == null ? null : data.getClass();
+        if (currentReadWriteVersion == -1)
+            throw new RuntimeException("currentReadWriteVersion must be set before writing.");
         if (currentReadWriteVersion < 0 || minimumReadVersion < 0)
             throw new RuntimeException("currentReadWriteVersion and minimumReadVersion must not be less than 0.");
         if (currentReadWriteVersion < minimumReadVersion)
             throw new RuntimeException("currentReadWriteVersion cannot be lower than minimumReadVersion");
 
+        Class type = data == null ? null : data.getClass();
+        pushHeader(kryo, this);
         output.writeInt(GRAPH_HEADER_VERSION, true);
         kryo.writeClass(output, type);
         output.writeInt(Version.MAJOR, true);
@@ -201,10 +236,12 @@ public class GraphHeader<T> implements KryoSerializable{
         writeExtra(kryo, output);
         if (data != null)
             kryo.writeObject(output, data);
+        popHeader(kryo);
     }
 
     @Override
     public final void read (Kryo kryo, Input input) {
+        pushHeader(kryo, this);
         input.readInt(true); //if this class ever evolves, version can be used for backward compatibility
         Class dataType = kryo.readClass(input).getType();
         gdxMajorVersion = input.readInt(true);
@@ -216,9 +253,10 @@ public class GraphHeader<T> implements KryoSerializable{
         useCompactColor = input.readBoolean();
         includePixmapDrawingParams = input.readBoolean();
         readExtra(kryo, input);
-        if (dataType != null && minimumReadVersion >= currentReadWriteVersion){
+        if (dataType != null && minimumReadVersion <= currentReadWriteVersion){
             data = (T)kryo.readObject(input, dataType);
         }
+        popHeader(kryo);
     }
 
 }

@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.collision.Sphere;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.cyphercove.gdx.gdxtokryo.GdxToKryo;
+import com.cyphercove.gdx.gdxtokryo.GraphHeader;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -21,6 +22,8 @@ import java.util.Arrays;
 import java.util.Random;
 
 public abstract class GdxToKryoTest extends TestCase {
+
+    public static boolean logInequalities = true;
 
     protected Kryo kryo;
     protected final Random random = new Random();
@@ -43,253 +46,335 @@ public abstract class GdxToKryoTest extends TestCase {
         if (a == b)
             return true;
         if (a == null || b == null)
-            return false;
+            return reportInequality(a, b);
         if (a.getClass() != b.getClass())
-            return false;
+            return reportInequality(a, b);
         final Class type = a.getClass();
         if (type == float[].class){
-            return Arrays.equals((float[])a, (float[])b);
+            boolean equal = Arrays.equals((float[])a, (float[])b);
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == int[].class){
-            return Arrays.equals((int[])a, (int[])b);
+            boolean equal = Arrays.equals((int[])a, (int[])b);
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (a instanceof Object[]){
             Object[] _a = (Object[])a;
             Object[] _b = (Object[])b;
             if (_a.length != _b.length)
-                return false;
+                reportInequality(a, b);
             for (int i = 0; i < _a.length; i++) {
                 if (!equals(_a[i], _b[i]))
-                    return false;
+                    reportInequality(a, b);
             }
             return true;
         } else if (type == OrthographicCamera.class){
             OrthographicCamera camA = (OrthographicCamera)a;
             OrthographicCamera camB = (OrthographicCamera)b;
-            return equals(camA.position, camB.position) && equals(camA.direction, camB.direction) && equals(camA.up, camB.up) &&
+            boolean equal = equals(camA.position, camB.position) && equals(camA.direction, camB.direction) && equals(camA.up, camB.up) &&
                     equals(camA.projection, camB.projection) && camA.near == camB.near && camA.far == camB.far && camA.viewportWidth == camB.viewportWidth &&
                     camA.viewportHeight == camB.viewportHeight && camA.zoom == camB.zoom;
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == PerspectiveCamera.class){
             PerspectiveCamera camA = (PerspectiveCamera)a;
             PerspectiveCamera camB = (PerspectiveCamera)b;
-            return equals(camA.position, camB.position) && equals(camA.direction, camB.direction) && equals(camA.up, camB.up) &&
+            boolean equal = equals(camA.position, camB.position) && equals(camA.direction, camB.direction) && equals(camA.up, camB.up) &&
                     equals(camA.projection, camB.projection) && camA.near == camB.near && camA.far == camB.far && camA.viewportWidth == camB.viewportWidth &&
                     camA.viewportHeight == camB.viewportHeight && camA.fieldOfView == camB.fieldOfView;
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Pixmap.class){
             ByteBuffer aPixels = ((Pixmap)a).getPixels();
             ByteBuffer bPixels = ((Pixmap)b).getPixels();
-            return aPixels.equals(bPixels);
+            boolean equal = aPixels.equals(bPixels);
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Affine2.class){
-            return a.toString().equals(b.toString());
+            boolean equal = a.toString().equals(b.toString());
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Bezier.class){
-            return equals(((Bezier)a).points, ((Bezier)b).points);
+            boolean equal = equals(((Bezier)a).points, ((Bezier)b).points);
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == BSpline.class){
             BSpline _a = (BSpline)a;
             BSpline _b = (BSpline)b;
-            return _a.spanCount == _b.spanCount && _a.continuous == _b.continuous && _a.degree == _b.degree &&
+            boolean equal = _a.spanCount == _b.spanCount && _a.continuous == _b.continuous && _a.degree == _b.degree &&
                     equals(_a.knots, _b.knots) && equals(_a.controlPoints, _b.controlPoints);
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == CatmullRomSpline.class){
             CatmullRomSpline _a = (CatmullRomSpline)a;
             CatmullRomSpline _b = (CatmullRomSpline)b;
-            return _a.spanCount == _b.spanCount && _a.continuous == _b.continuous && equals(_a.controlPoints, _b.controlPoints);
+            boolean equal = _a.spanCount == _b.spanCount && _a.continuous == _b.continuous &&
+                    equals(_a.controlPoints, _b.controlPoints);
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Matrix3.class){
-            return equals(((Matrix3)a).val, ((Matrix3)b).val);
+            boolean equal = equals(((Matrix3)a).val, ((Matrix3)b).val);
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Matrix4.class){
-            return equals(((Matrix4)a).val, ((Matrix4)b).val);
+            boolean equal = equals(((Matrix4)a).val, ((Matrix4)b).val);
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Plane.class){
             Plane _a = (Plane)a;
             Plane _b = (Plane)b;
-            return  _a.d == _b.d && equals(_a.normal, _b.normal);
+            boolean equal =  _a.d == _b.d && equals(_a.normal, _b.normal);
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Polygon.class){
             Polygon _a = (Polygon)a;
             Polygon _b = (Polygon)b;
-            return _a.getX() == _b.getX() && _a.getY() == _b.getY() && _a.getOriginX() == _b.getOriginX() &&
+            boolean equal = _a.getX() == _b.getX() && _a.getY() == _b.getY() && _a.getOriginX() == _b.getOriginX() &&
                     _a.getOriginY() == _b.getOriginY() && _a.getRotation() == _b.getRotation() &&
                     _a.getScaleX() == _b.getScaleX() && _a.getScaleY() == _b.getScaleY() &&
                     equals(_a.getVertices(), _b.getVertices());
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Polyline.class){
             Polyline _a = (Polyline)a;
             Polyline _b = (Polyline)b;
-            return _a.getX() == _b.getX() && _a.getY() == _b.getY() && _a.getOriginX() == _b.getOriginX() &&
+            boolean equal = _a.getX() == _b.getX() && _a.getY() == _b.getY() && _a.getOriginX() == _b.getOriginX() &&
                     _a.getOriginY() == _b.getOriginY() && _a.getRotation() == _b.getRotation() &&
                     _a.getScaleX() == _b.getScaleX() && _a.getScaleY() == _b.getScaleY() &&
                     equals(_a.getVertices(), _b.getVertices());
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Quaternion.class){
             Quaternion _a = (Quaternion)a;
             Quaternion _b = (Quaternion)b;
-            return _a.x == _b.x && _a.y == _b.y && _a.z == _b.z && _a.w == _b.w;
+            boolean equal = _a.x == _b.x && _a.y == _b.y && _a.z == _b.z && _a.w == _b.w;
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == RandomXS128.class){
             RandomXS128 _a = (RandomXS128)a;
             RandomXS128 _b = (RandomXS128)b;
-            return _a.getState(0) == _b.getState(0) && _a.getState(1) == _b.getState(1) && _a.nextFloat() == _b.nextFloat();
+            boolean equal = _a.getState(0) == _b.getState(0) &&
+                    _a.getState(1) == _b.getState(1) && _a.nextFloat() == _b.nextFloat();
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Rectangle.class) {
             Rectangle _a = (Rectangle) a;
             Rectangle _b = (Rectangle) b;
-            return _a.x == _b.x && _a.y == _b.y && _a.width == _b.width && _a.height == _b.height;
+            boolean equal = _a.x == _b.x && _a.y == _b.y && _a.width == _b.width && _a.height == _b.height;
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Vector2.class){
             Vector2 _a = (Vector2)a;
             Vector2 _b = (Vector2)b;
-            return _a.x == _b.x && _a.y == _b.y;
+            boolean equal = _a.x == _b.x && _a.y == _b.y;
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == Vector3.class){
             Vector3 _a = (Vector3)a;
             Vector3 _b = (Vector3)b;
-            return _a.x == _b.x && _a.y == _b.y && _a.z == _b.z;
+            boolean equal = _a.x == _b.x && _a.y == _b.y && _a.z == _b.z;
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == BoundingBox.class){
             BoundingBox _a = (BoundingBox)a;
             BoundingBox _b = (BoundingBox)b;
-            return equals(_a.min, _b.min) && equals(_a.max, _b.max);
+            boolean equal = equals(_a.min, _b.min) && equals(_a.max, _b.max);
+            if (!equal) reportInequality(a, b);
+            return equal;
         } else if (type == ArrayMap.class){
             ArrayMap<?,?> _a = (ArrayMap<?,?>)a;
             ArrayMap<?,?> _b = (ArrayMap<?,?>)b;
             if (_a.size != _b.size)
-                return false;
+                return reportInequality(a, b);
             if (_a.ordered != _b.ordered)
-                return false;
+                return reportInequality(a, b);
             for (int i = 0; i < _a.size; i++) {
                 if (!equals(_a.getKeyAt(i), _b.getKeyAt(i)) || !equals(_a.getValueAt(i), _b.getValueAt(i)))
-                    return false;
+                    return reportInequality(a, b);
             }
             return true;
         } else if (type == Array.class || type == DelayedRemovalArray.class || type == SnapshotArray.class){
             Array<?> _a = (Array<?>)a;
             Array<?> _b = (Array<?>)b;
             if (_a.size != _b.size)
-                return false;
+                return reportInequality(a, b);
             for (int i = 0; i < _a.size; i++) {
                 if (!equals(_a.get(i), _b.get(i)))
-                    return false;
+                    return reportInequality(a, b);
             }
             return true;
         } else if (type == IdentityMap.class){
             IdentityMap<?, ?> _a = (IdentityMap<?, ?>)a;
             IdentityMap<?, ?> _b = (IdentityMap<?, ?>)b;
             if (_a.size != _b.size)
-                return false;
+                return reportInequality(a, b);
             outer:
             for (IdentityMap.Entry entryA : _a.entries()){
                 for (IdentityMap.Entry entryB : _b.entries()){
                     if (equals(entryA.key, entryB.key) && equals(entryA.value, entryB.value))
                         continue outer;
                 }
-                return false;
+                return reportInequality(a, b);
             }
             return true;
         } else if (type == LongMap.class){
             LongMap<?> _a = (LongMap<?>)a;
             LongMap<?> _b = (LongMap<?>)b;
             if (_a.size != _b.size)
-                return false;
+                return reportInequality(a, b);
             for (LongMap.Entry entry : _a.entries()){
                 if (!_b.containsKey(entry.key))
-                    return false;
+                    return reportInequality(a, b);
                 if (!equals(entry.value, _b.get(entry.key)))
-                    return false;
+                    return reportInequality(a, b);
             }
             return true;
         } else if (type == ObjectFloatMap.class){
             ObjectFloatMap<?> _a = (ObjectFloatMap<?>)a;
             ObjectFloatMap<?> _b = (ObjectFloatMap<?>)b;
             if (_a.size != _b.size)
-                return false;
+                return reportInequality(a, b);
             for (ObjectFloatMap.Entry entry : _a.entries()){
                 if (!_b.containsValue(entry.value))
-                    return false;
+                    return reportInequality(a, b);
                 if (!equals(entry.key, _b.findKey(entry.value)))
-                    return false;
+                    return reportInequality(a, b);
             }
             return true;
         } else if (type == ObjectIntMap.class){
             ObjectIntMap<?> _a = (ObjectIntMap<?>)a;
             ObjectIntMap<?> _b = (ObjectIntMap<?>)b;
             if (_a.size != _b.size)
-                return false;
-            for (ObjectIntMap.Entry entry : _a.entries()){
-                if (!_b.containsValue(entry.value))
-                    return false;
-                if (!equals(entry.key, _b.findKey(entry.value)))
-                    return false;
+                return reportInequality(a, b);
+            outer:
+            for (ObjectIntMap.Entry entryA : _a.entries()){
+                if (!_b.containsValue(entryA.value))
+                    return reportInequality("b doesn't contain value " + entryA.value, a, b);
+                for (ObjectIntMap.Entry entryB : _b.entries()){
+                    if (entryB.value == entryA.value && equals(entryA.key, entryB.key)){
+                        continue outer;
+                    }
+                }
+                return reportInequality("b doesn't contain entry " + entryA.key + ", " + entryA.value, a, b);
             }
             return true;
         } else if (type == ObjectMap.class){
             ObjectMap<?, ?> _a = (ObjectMap<?, ?>)a;
             ObjectMap<?, ?> _b = (ObjectMap<?, ?>)b;
             if (_a.size != _b.size)
-                return false;
+                return reportInequality(a, b);
             outer:
             for (ObjectMap.Entry entryA : _a.entries()){
                 for (ObjectMap.Entry entryB : _b.entries()){
                     if (equals(entryA.key, entryB.key) && equals(entryA.value, entryB.value))
                         continue outer;
                 }
-                return false;
+                return reportInequality(a, b);
             }
             return true;
         } else if (type == ObjectSet.class){
             ObjectSet<?> _a = (ObjectSet<?>)a;
             ObjectSet<?> _b = (ObjectSet<?>)b;
             if (_a.size != _b.size)
-                return false;
+                return reportInequality(a, b);
             outer:
             for (Object objectA : _a){
                 for (Object objectB : _b){
                     if (equals(objectA, objectB))
                         continue outer;
                 }
-                return false;
+                return reportInequality(a, b);
             }
             return true;
         } else if (type == OrderedMap.class){
             OrderedMap<?, ?> _a = (OrderedMap<?, ?>)a;
             OrderedMap<?, ?> _b = (OrderedMap<?, ?>)b;
             if (_a.size != _b.size)
-                return false;
+                return reportInequality(a, b);
             OrderedMap.Entries iteratorA = _a.iterator();
             OrderedMap.Entries iteratorB = _b.iterator();
             while (iteratorA.hasNext()){
                 if (!iteratorB.hasNext())
-                    return false;
+                    return reportInequality(a, b);
                 ObjectMap.Entry entryA = iteratorA.next();
                 ObjectMap.Entry entryB = iteratorB.next();
                 if (!equals(entryA.key, entryB.key) || !equals(entryA.value, entryB.value))
-                    return false;
+                    return reportInequality(a, b);
             }
             return true;
         } else if (type == OrderedSet.class){
             OrderedSet<?> _a = (OrderedSet<?>)a;
             OrderedSet<?> _b = (OrderedSet<?>)b;
             if (_a.size != _b.size)
-                return false;
+                return reportInequality(a, b);
             OrderedSet.OrderedSetIterator iteratorA = _a.iterator();
             OrderedSet.OrderedSetIterator iteratorB = _b.iterator();
             while (iteratorA.hasNext()){
                 if (!iteratorB.hasNext())
-                    return false;
+                    return reportInequality(a, b);
                 if (!equals(iteratorA.next(), iteratorB.next()))
-                    return false;
+                    return reportInequality(a, b);
             }
             return true;
         } else if (type == Queue.class){
             Queue<?> _a = (Queue<?>)a;
             Queue<?> _b = (Queue<?>)b;
             if (_a.size != _b.size)
-                return false;
+                return reportInequality(a, b);
             for (int i = 0; i < _a.size; i++) {
                 if (!equals(_a.get(i), _b.get(i)))
-                    return false;
+                    return reportInequality(a, b);
             }
             return true;
         } else if (type == SortedIntList.class){
             SortedIntList<?> _a = (SortedIntList<?>)a;
             SortedIntList<?> _b = (SortedIntList<?>)b;
             if (_a.size() != _b.size())
-                return false;
+                return reportInequality(a, b);
             for (int i = 0; i < _a.size(); i++) {
                 if (!equals(_a.get(i), _b.get(i)))
-                    return false;
+                    return reportInequality(a, b);
             }
             return true;
         } else if (type == StringBuilder.class) {
-            return a.toString().equals(b.toString());
+            boolean equal = a.toString().equals(b.toString());
+            if (!equal) reportInequality(a, b);
+            return equal;
+        } else if (type == GraphHeader.class){
+            GraphHeader _a = (GraphHeader)a;
+            GraphHeader _b = (GraphHeader)b;
+            boolean equal = _a.useCompactColor ==_b.useCompactColor && _a.includePixmapDrawingParams == _b.includePixmapDrawingParams &&
+                    equals(_a.data, _b.data);
+            if (!equal) reportInequality(a, b);
+            return equal;
         }
-        return a.equals(b);
+        boolean equal = a.equals(b);
+        if (!equal) reportInequality(a, b);
+        return equal;
+    }
+
+    private static boolean reportInequality (Object a, Object b){
+        if (logInequalities) {
+            if (a == null)
+                System.err.println(String.format("Second object (%s: %s) paired with null", b.getClass().getSimpleName(), b));
+            else if (b == null)
+                System.err.println(String.format("First object (%s: %s) paired with null", a.getClass().getSimpleName(), a));
+            else
+                System.err.println(String.format("Inequal objects:\n%s: %s\n%s: %s\n.", a.getClass().getSimpleName(), a, b.getClass().getSimpleName(), b));
+        }
+        return false;
+    }
+
+    private static boolean reportInequality (String msg, Object a, Object b){
+        if (logInequalities) {
+            if (a == null)
+                System.err.println(String.format("Second object (%s: %s) paired with null", b.getClass().getSimpleName(), b));
+            else if (b == null)
+                System.err.println(String.format("First object (%s: %s) paired with null", a.getClass().getSimpleName(), a));
+            else
+                System.err.println(String.format("Inequal objects (%s):\n%s: %s\n%s: %s\n.", msg, a.getClass().getSimpleName(), a, b.getClass().getSimpleName(), b));
+        }
+        return false;
     }
 
     float[] generateRandomFloatArray (int length){
@@ -330,5 +415,21 @@ public abstract class GdxToKryoTest extends TestCase {
 
         assertTrue(equals(object, object1));
         return object1;
+    }
+
+    byte[] write (Object object){
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        Output output = new Output(outStream);
+        kryo.writeClassAndObject(output, object);
+        output.close();
+        return outStream.toByteArray();
+    }
+
+    <T> T read (byte[] bytes, Class<T> type){
+        ByteArrayInputStream inStream = new ByteArrayInputStream(bytes);
+        Input input = new Input(inStream);
+        T object = (T)kryo.readClassAndObject(input);
+        input.close();
+        return object;
     }
 }
