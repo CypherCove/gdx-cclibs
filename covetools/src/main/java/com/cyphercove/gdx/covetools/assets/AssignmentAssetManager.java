@@ -284,7 +284,7 @@ public class AssignmentAssetManager extends AssetManager {
 			}
 		}
 		for (Object[] array : assetArrays.keys()){
-			Field[] fields = ClassReflection.getFields(assetContainer.getClass());
+			Field[] fields = ClassReflection.getDeclaredFields(assetContainer.getClass());
 			for (Field field : fields){
 				makeAccessible(field);
 				try {

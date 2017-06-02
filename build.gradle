@@ -26,7 +26,7 @@ allprojects {
   }
 }
 
-subprojects {
+subprojects  {
   apply plugin: 'java'
   apply plugin: 'maven'
   apply plugin: 'signing'
@@ -64,7 +64,7 @@ subprojects {
   }
 
   dependencies {
-    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+    provided "com.badlogicgames.gdx:gdx:$gdxVersion"
     testCompile "junit:junit:$junitVersion"
     deployerJars "org.apache.maven.wagon:wagon-ssh:$wagonVersion"
     deployerJars "org.apache.maven.wagon:wagon-http:$wagonVersion"
@@ -151,14 +151,16 @@ distributions {
     baseName = libVersion
     contents {
       project.subprojects.each { sub ->
-        into('lib') {
-          from sub.jar
-        }
-        into('src') {
-          from sub.sourcesJar
-        }
-        into('doc') {
-          from sub.javadocJar
+        if (sub.name != 'examples') {
+          into('lib') {
+            from sub.jar
+          }
+          into('src') {
+            from sub.sourcesJar
+          }
+          into('doc') {
+            from sub.javadocJar
+          }
         }
       }
     }

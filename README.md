@@ -46,3 +46,6 @@ To use Eclipse IDE, do the following after repository cloning:
 - `gradle closeAndPromoteRepository` - closes and promotes Nexus repository. Run after `uploadArchives`.
 
 To run a task on a specific library, proceed task name with its project ID. For example, `gradle flexbatch:build` will build archives of the FlexBatch library.
+
+### Running examples
+The examples should be imported as a separate project from the rest via `examples/build.gradle`.

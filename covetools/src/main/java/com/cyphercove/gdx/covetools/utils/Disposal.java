@@ -18,12 +18,16 @@ package com.cyphercove.gdx.covetools.utils;
 import java.lang.annotation.*;
 import java.security.AccessControlException;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.reflect.*;
 
 /**
- * Convenience methods for disposing and nulling fields for Disposable objects.
+ * Convenience methods for disposing and nulling fields for {@link Disposable} objects.
+ * <p>
+ * Do not use on fields referencing objects that came from an AssetManager. The AssetManager must handle disposal of
+ * those objects.
  *
  * @author cypherdare
  */
@@ -33,8 +37,8 @@ public class Disposal {
      * values to null.
      * @param object The object containing references to Disposable objects.
      */
-    public static void disposeAll (Object object){
-        disposeAllExcept(object);
+    public static void clear (Object object) {
+        clearExcept(object);
     }
 
     /** Disposes all {@link Disposable} objects referenced by fields in the specified object and sets those field
@@ -42,8 +46,8 @@ public class Disposal {
      * @param object The object containing references to Disposable objects.
      * @param skippedGroup Fields annotated with {@link Group} with matching numbers will not be disposed.
      */
-    public static void disposeAllExcept (Object object, int... skippedGroup){
-        Field[] fields = ClassReflection.getFields(object.getClass());
+    public static void clearExcept (Object object, int... skippedGroup){
+        Field[] fields = ClassReflection.getDeclaredFields(object.getClass());
         boolean checkGroups = skippedGroup != null && skippedGroup.length > 0;
         outer:
         for (Field field : fields){
@@ -56,26 +60,35 @@ public class Disposal {
                             continue outer;
                 }
             }
-            disposeAndNullField(object, field);
+            clearFieldIfDisposable(object, field);
         }
     }
 
     /** Disposes all {@link Disposable} objects referenced by fields in the specified object and sets those field
-     * values to null, if they are tagged with the corresponding group number.
+     * values to null, if they are tagged with a given group number.
      * @param object The object containing references to Disposable objects.
-     * @param groupNumber The {@link Group} value of fields that will be disposed.
+     * @param groupNumber The {@link Group} value(s) of fields that will be disposed.
      */
-    public static void disposeGroup (Object object, int groupNumber){
-        Field[] fields = ClassReflection.getFields(object.getClass());
+    public static void clear (Object object, int... groupNumber){
+        if (groupNumber == null || groupNumber.length == 0)
+            return;
+        Field[] fields = ClassReflection.getDeclaredFields(object.getClass());
+        outer:
         for (Field field : fields){
             com.badlogic.gdx.utils.reflect.Annotation groupAnnotation = field.getDeclaredAnnotation(Group.class);
-            if (groupAnnotation == null || groupAnnotation.getAnnotation(Group.class).value() != groupNumber)
+            if (groupAnnotation == null)
                 continue;
-            disposeAndNullField(object, field);
+            int fieldGroup = groupAnnotation.getAnnotation(Group.class).value();
+            for (int i : groupNumber){
+                if (fieldGroup == i){
+                    clearFieldIfDisposable(object, field);
+                    continue outer;
+                }
+            }
         }
     }
 
-    private static void disposeAndNullField (Object object, Field field){
+    private static void clearFieldIfDisposable (Object object, Field field){
         makeAccessible(field);
         Object referenced = null;
         try {
@@ -86,7 +99,14 @@ public class Disposal {
             }
         }
         if (referenced instanceof Disposable){
-            ((Disposable) referenced).dispose();
+            try {
+                ((Disposable) referenced).dispose();
+            } catch (GdxRuntimeException e){
+                // Some classes such as Pixmap throw when disposed multiple times.
+                Gdx.app.error("Disposal",
+                        String.format("Field %s threw an exception when disposed. It may have been disposed already. Ignoring and continuing.",
+                                field, e));
+            }
             try {
                 field.set(object, null);
             } catch (ReflectionException e) {
@@ -106,12 +126,12 @@ public class Disposal {
     }
 
     /**
-     * Annotation for a field to give it a named group for use with the {@link #disposeGroup(Object, int)} method.
+     * Annotation for a field to give assign it to a group for use with the {@link #clear(Object, int...)} method.
      */
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     public @interface Group {
-        int value(); // the paths
+        int value();
     }
 }

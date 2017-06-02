@@ -45,11 +45,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.cyphercove.gdx.Example;
+import com.cyphercove.gdx.covetools.utils.Disposal;
 import com.cyphercove.gdx.flexbatch.CompliantBatch;
 import com.cyphercove.gdx.flexbatch.FlexBatch;
 import com.cyphercove.gdx.flexbatch.batchable.Poly2D;
@@ -83,7 +85,6 @@ public class FlexBatchTest extends Example {
 	Sprite testSprite;
 	BitmapFont testFont;
 	PolygonRegion polygonRegion;
-	final ObjectSet<Disposable> disposables = new ObjectSet<Disposable>();
 	private static final int W = 800, H = 480;
 	float elapsed;
 	Array<Item> items = new Array<Item>();
@@ -167,9 +168,7 @@ public class FlexBatchTest extends Example {
 		viewport = new ExtendViewport(W, H);
 
 		texture = new Texture("badlogic.jpg");
-		disposables.add(texture);
 		atlas = new TextureAtlas(Gdx.files.internal("pack"));
-		disposables.add(atlas);
 
 		testSprite = new Sprite(texture);
 		testSprite.setPosition(50, 102);
@@ -179,7 +178,6 @@ public class FlexBatchTest extends Example {
 		testFont.setColor(Color.CYAN);
 
 		treeTexture = new Texture(Gdx.files.internal("tree.png"));
-		disposables.add(treeTexture);
 		PolygonRegionLoader loader = new PolygonRegionLoader();
 		polygonRegion = loader.load(new TextureRegion(treeTexture), Gdx.files.internal("tree.psh"));
 
@@ -195,11 +193,9 @@ public class FlexBatchTest extends Example {
 
 		spriteBatch = new SpriteBatch(100);
 		spriteBatch.enableBlending();
-		disposables.add(spriteBatch);
 
 		quad2dBatch = new CompliantBatch<BumpQuad>(BumpQuad.class, 4000, true);
 		quad2dBatch.enableBlending();
-		disposables.add(quad2dBatch);
 		for (int i = 0; i < 80; i++) { // The second texture and extra
 										// attributes for these will go unused
 			BumpQuad sprite = new BumpQuad();
@@ -209,22 +205,17 @@ public class FlexBatchTest extends Example {
 		}
 
 		solidQuadBatch = new FlexBatch<SolidQuad>(SolidQuad.class, 10, 0);
-		disposables.add(solidQuadBatch);
 		solidShader = new ShaderProgram(BatchablePreparation.generateGenericVertexShader(0),
 				BatchablePreparation.generateGenericFragmentShader(0));
-		disposables.add(solidShader);
 		solidQuadBatch.setShader(solidShader);
 
 		egg = new Texture(Gdx.files.internal("egg.png"));
 		egg.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-		disposables.add(egg);
 		wheel = new Texture(Gdx.files.internal("wheel.png"));
 		wheel.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-		disposables.add(wheel);
 
 		typicalShader = new ShaderProgram(BatchablePreparation.generateGenericVertexShader(1),
 				BatchablePreparation.generateGenericFragmentShader(1));
-		disposables.add(typicalShader);
 		pCam = new PerspectiveCamera();
 		pCam.near = 0.1f;
 		pCam.far = 10000f;
@@ -233,28 +224,24 @@ public class FlexBatchTest extends Example {
 		pCam.update();
 		quad3dBatch = new FlexBatch<Quad3D>(Quad3D.class, 4000, 0);
 		quad3dBatch.setShader(typicalShader);
-		disposables.add(quad3dBatch);
 		quad3dSorter = new BatchableSorter<Quad3D>(pCam);
 		for (int i = 0; i < 500; i++) {
 			quad3ds.add(makeQuad3D(10, 40));
 		}
 
 		poly2dBatch = new FlexBatch<Poly2D>(Poly2D.class, 1000, 2000);
-		disposables.add(poly2dBatch);
 		poly2dBatch.setShader(typicalShader);
 
 		bumpShader = new ShaderProgram(Gdx.files.internal("bump.vert").readString(),
 				Gdx.files.internal("bump.frag").readString());
 		if (!bumpShader.isCompiled())
 			Gdx.app.log("bump shader error", bumpShader.getLog());
-		disposables.add(bumpShader);
 		bumpShader.begin();
 		bumpShader.setUniformf("u_ambient", new Color(0.05f, 0.05f, 0.1f, 1));
 		bumpShader.setUniformf("u_specularStrength", 0.7f);
 		bumpShader.setUniformf("u_attenuation", 0.002f);
 		bumpShader.end();
 		bumpAtlas = new TextureAtlas("normalMappedSprites.atlas");
-		disposables.add(bumpAtlas);
 		for (int i = 0; i < 6; i++) {
 			String baseName;
 			float shininess;
@@ -279,7 +266,6 @@ public class FlexBatchTest extends Example {
 			bumpQuads.add(quad);
 		}
 		bumpBatch = new FlexBatch<BumpQuad>(BumpQuad.class, 100, 0);
-		disposables.add(bumpBatch);
 		bumpBatch.setShader(bumpShader);
 
 		setupUI();
@@ -411,9 +397,7 @@ public class FlexBatchTest extends Example {
 
 	private void setupUI() {
 		stage = new Stage(new ScreenViewport(), quad2dBatch);
-		disposables.add(stage);
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
-		disposables.add(skin);
 
 		final SelectBox<Test> selectBox = new SelectBox<Test>(skin);
 		selectBox.setItems(Test.values());
@@ -443,8 +427,18 @@ public class FlexBatchTest extends Example {
 	}
 
 	public void dispose() {
-		for (Disposable disposable : disposables)
-			disposable.dispose();
+		Disposal.clear(this);
+
+		Array<Object> fieldChecks = new Array<Object>();
+		fieldChecks.add(texture);
+		fieldChecks.add(bumpBatch);
+		fieldChecks.add(poly2dBatch);
+		fieldChecks.add(skin);
+
+		for (int i = 0; i < fieldChecks.size; i++) {
+			if (fieldChecks.get(i) != null)
+				Gdx.app.error("Disposal check", "Field " + i + " is not null.");
+		}
 	}
 
 	int idx;
