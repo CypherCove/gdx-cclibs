@@ -399,7 +399,7 @@ public class FlexBatch<T extends Batchable> implements Disposable {
 	public void flush () {
 		if (havePendingInternal) drawPending();
 		if (vertIdx == 0) {
-			renderContext.executeChanges(); // first item
+			if (drawing) renderContext.executeChanges(); // first item
 			return;
 		}
 
