@@ -177,6 +177,7 @@ public class FlexBatch<T extends Batchable> implements Disposable {
 
 		renderContext.begin();
 		internalBatchable.prepareSharedContext(renderContext);
+		renderContext.executeChanges();
 		shader.begin();
 		applyMatrices();
 
