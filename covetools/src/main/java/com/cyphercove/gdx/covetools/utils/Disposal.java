@@ -126,7 +126,7 @@ public class Disposal {
     }
 
     /**
-     * Annotation for a field to give assign it to a group for use with the {@link #clear(Object, int...)} method.
+     * Annotation for a field to assign it to a group for use with the {@link #clear(Object, int...)} method.
      */
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
