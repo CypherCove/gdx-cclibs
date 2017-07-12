@@ -1,1 +1,1 @@
-include 'flexbatch', 'covetools', 'gdxtokryo'
+include ':covetools', ':covetools-android', ':flexbatch', ':gdxtokryo'
