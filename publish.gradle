@@ -21,7 +21,7 @@ uploadArchives {
 
             pom.project {
                 name = projectName
-                packaging 'aar'
+                packaging 'jar'
                 description = projectDesc
                 url 'http://github.com/cyphercove/gdx-cclibs/'
 
@@ -57,34 +57,28 @@ uploadArchives {
 }
 
 signing {
-    required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
+    required { isReleaseVersion() && gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
 }
 
-task androidJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    // JDK 1.8 is more strict then 1.7. Have JDK 1.8 behave like 1.7 for javadoc generation
-    if (org.gradle.internal.jvm.Jvm.current().getJavaVersion() == JavaVersion.VERSION_1_8) {
-        options.addStringOption('Xdoclint:none', '-quiet')
-    }
+task libraryJar(type: Jar, dependsOn:classes) {
+    from sourceSets.main.output.classesDir
+    from configurations.custom.collect { it.isDirectory() ? it : zipTree(it) }
+    classifier = 'library'
 }
 
-task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    classifier = 'javadoc'
-    from androidJavadocs.destinationDir
-}
-
-task androidSourcesJar(type: Jar) {
+task sourcesJar(type: Jar, dependsOn:classes) {
+    from sourceSets.main.allSource
     classifier = 'sources'
-    from android.sourceSets.main.java.sourceFiles
+}
+
+task javadocJar(type: Jar, dependsOn:javadoc) {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
 }
 
 artifacts {
-    archives androidSourcesJar
-    archives androidJavadocsJar
-}
-
-afterEvaluate {
-    androidJavadocs.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
+    archives libraryJar
+    archives sourcesJar
+    archives javadocJar
 }
