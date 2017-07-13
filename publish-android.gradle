@@ -66,28 +66,24 @@ signing {
     sign configurations.archives
 }
 
-//task sourcesJar(type: Jar) {
-//    classifier = 'sources'
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
 //    from android.sourceSets.main.java.srcDirs
-//}
+}
 
-//task javadoc(type: Javadoc) {
+task javadoc(type: Javadoc) {
 //    source = android.sourceSets.main.java.srcDirs
 //    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-//    destinationDir = file("../javadoc/")
-//    failOnError false
-//}
-//
-//task javadocJar(type: Jar, dependsOn: Javadoc) {
-//    classifier = 'javadoc'
-//    from Javadoc.destinationDir
-//}
+    destinationDir = file("../javadoc/")
+    failOnError false
+}
+
+task javadocJar(type: Jar, dependsOn: Javadoc) {
+    classifier = 'javadoc'
+    from javadoc.getDestinationDir()
+}
 
 artifacts {
-//    archives javadocJar
-//    archives sourcesJar
+    archives javadocJar
+    archives sourcesJar
 }
-//
-//afterEvaluate {
-//    androidJavadocs.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
-//}
