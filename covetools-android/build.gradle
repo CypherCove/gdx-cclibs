@@ -17,4 +17,8 @@ def getSrcDirs (){
     return android.sourceSets.main.java.srcDirs
 }
 
+ext {
+    ARTIFACTID = 'covetools-android'
+}
+
 apply from: '../publish-android.gradle'

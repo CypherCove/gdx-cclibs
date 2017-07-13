@@ -2,12 +2,23 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'distribution'
 
-archivesBaseName = projectName
-
 nexusStaging {
     packageGroup = 'com.cyphercove.gdx'
     username = ossrhUsername
     password = ossrhPassword
+}
+
+
+def isReleaseBuild() {
+    return false
+}
+
+def getLibraryVersion() {
+    if (isReleaseBuild()) {
+        return LIBRARY_VERSION.replace("-SNAPSHOT", "")
+    } else {
+        return LIBRARY_VERSION;
+    }
 }
 
 uploadArchives {
