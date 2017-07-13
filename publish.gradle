@@ -1,6 +1,6 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
-apply plugin: 'distribution'
+//apply plugin: 'distribution'
 
 archivesBaseName = projectName
 
@@ -10,82 +10,83 @@ nexusStaging {
     password = ossrhPassword
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+//afterEvaluate { project ->
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            if (isReleaseBuild()) {
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-            }
-            else {
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-            }
-
-            pom.project {
-                name = projectName
-                packaging 'jar'
-                description = projectDesc
-                url 'http://github.com/cyphercove/gdx-cclibs/'
-
-                licenses {
-                    license {
-                        name 'The Apache License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                if (isReleaseBuild()) {
+                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                        authentication(userName: ossrhUsername, password: ossrhPassword)
+                    }
+                } else {
+                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                        authentication(userName: ossrhUsername, password: ossrhPassword)
                     }
                 }
 
-                scm {
-                    connection 'scm:git:git@github.com:cyphercove/gdx-cclibs.git'
-                    developerConnection 'scm:git:git@cyphercove/gdx-cclibs.git'
+                pom.project {
+                    name = projectName
+                    packaging 'jar'
+                    description = projectDesc
                     url 'http://github.com/cyphercove/gdx-cclibs/'
-                }
 
-                organization {
-                    name 'Cypher Cove'
-                    url 'www.cyphercove.com'
-                }
-
-                developers {
-                    developer {
-                        id 'cypherdare'
-                        name 'Darren'
-                        email 'contact@cyphercove.com'
+                    licenses {
+                        license {
+                            name 'The Apache License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
                     }
-                }
 
+                    scm {
+                        connection 'scm:git:git@github.com:cyphercove/gdx-cclibs.git'
+                        developerConnection 'scm:git:git@cyphercove/gdx-cclibs.git'
+                        url 'http://github.com/cyphercove/gdx-cclibs/'
+                    }
+
+                    organization {
+                        name 'Cypher Cove'
+                        url 'www.cyphercove.com'
+                    }
+
+                    developers {
+                        developer {
+                            id 'cypherdare'
+                            name 'Darren'
+                            email 'contact@cyphercove.com'
+                        }
+                    }
+
+                }
             }
         }
     }
-}
 
-signing {
-    required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
-}
+    signing {
+        required { isReleaseBuild() && gradle.taskGraph.hasTask("uploadArchives") }
+        sign configurations.archives
+    }
 
-//task libraryJar(type: Jar, dependsOn:classes) {
-//    from sourceSets.main.output.classesDir
-//    from configurations.custom.collect { it.isDirectory() ? it : zipTree(it) }
-//    classifier = 'library'
+    //task libraryJar(type: Jar, dependsOn:classes) {
+    //    from sourceSets.main.output.classesDir
+    //    from configurations.custom.collect { it.isDirectory() ? it : zipTree(it) }
+    //    classifier = 'library'
+    //}
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        from sourceSets.main.allSource
+        classifier = 'sources'
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        from javadoc.destinationDir
+        classifier = 'javadoc'
+    }
+
+    artifacts {
+        //    archives libraryJar
+        archives sourcesJar
+        archives javadocJar
+    }
 //}
-
-task sourcesJar(type: Jar, dependsOn:classes) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
-task javadocJar(type: Jar, dependsOn:javadoc) {
-    from javadoc.destinationDir
-    classifier = 'javadoc'
-}
-
-artifacts {
-//    archives libraryJar
-    archives sourcesJar
-    archives javadocJar
-}
