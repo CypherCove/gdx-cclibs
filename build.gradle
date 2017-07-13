@@ -2,41 +2,20 @@ buildscript {
   repositories {
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://plugins.gradle.org/m2/" }
+    jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:2.2.0'
+    classpath 'com.android.tools.build:gradle:2.2.3'
     classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
-    classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:3.0.3'
+    classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
   }
 }
+
+apply plugin: 'io.codearte.nexus-staging'
 
 ext {
   GROUPID = 'com.cyphercove.gdx'
   LIBRARY_VERSION = '1.1.0-SNAPSHOT'
-}
-
-apply plugin: 'distribution'
-apply plugin: 'io.codearte.nexus-staging'
-
-allprojects {
-  apply plugin: 'eclipse'
-  apply plugin: 'idea'
-
-  ext {
-    gdxVersion = '1.9.7-SNAPSHOT'
-  }
-
-  repositories {
-    mavenLocal()
-    jcenter()
-    mavenCentral()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-  }
-
-  group = GROUPID
-  version = getLibraryVersion()
 }
 
 def isReleaseBuild() {
@@ -51,8 +30,28 @@ def getLibraryVersion() {
   }
 }
 
+allprojects {
+  apply plugin: 'eclipse'
+  apply plugin: 'idea'
+
+  ext {
+    gdxVersion = '1.9.7-SNAPSHOT'
+  }
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+  }
+
+  group = GROUPID
+  version = getLibraryVersion()
+}
+
 subprojects {
   eclipse.project.name = projectName
+  project.group = rootProject.properties.GROUPID
 }
 
 configure([project(':covetools'), project(':flexbatch'), project(':gdxtokryo')])  {
@@ -68,28 +67,15 @@ configure([project(':covetools'), project(':flexbatch'), project(':gdxtokryo')])
     testCompile "junit:junit:$junitVersion"
   }
 
-  configurations {
-    custom
-    compile.extendsFrom custom
-  }
 }
 
 project(':covetools-android') {
-  configurations {
-    custom
-    compile.extendsFrom custom
-  }
+  apply plugin: 'com.android.library'
 
   dependencies {
     compile project(':covetools')
     compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
   }
-}
-
-nexusStaging {
-  packageGroup = 'com.cyphercove.gdx'
-  username = ossrhUsername
-  password = ossrhPassword
 }
 
 tasks.eclipse.doLast {

@@ -1,7 +1,14 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'distribution'
 
 archivesBaseName = projectName
+
+nexusStaging {
+    packageGroup = 'com.cyphercove.gdx'
+    username = ossrhUsername
+    password = ossrhPassword
+}
 
 uploadArchives {
     repositories {
@@ -61,11 +68,11 @@ signing {
     sign configurations.archives
 }
 
-task libraryJar(type: Jar, dependsOn:classes) {
-    from sourceSets.main.output.classesDir
-    from configurations.custom.collect { it.isDirectory() ? it : zipTree(it) }
-    classifier = 'library'
-}
+//task libraryJar(type: Jar, dependsOn:classes) {
+//    from sourceSets.main.output.classesDir
+//    from configurations.custom.collect { it.isDirectory() ? it : zipTree(it) }
+//    classifier = 'library'
+//}
 
 task sourcesJar(type: Jar, dependsOn:classes) {
     from sourceSets.main.allSource
@@ -78,7 +85,7 @@ task javadocJar(type: Jar, dependsOn:javadoc) {
 }
 
 artifacts {
-    archives libraryJar
+//    archives libraryJar
     archives sourcesJar
     archives javadocJar
 }
