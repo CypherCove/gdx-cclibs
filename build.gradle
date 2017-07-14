@@ -18,6 +18,18 @@ ext {
   LIBRARY_VERSION = '1.1.0-SNAPSHOT'
 }
 
+def isReleaseBuild() {
+  return false
+}
+
+def getLibraryVersion() {
+  if (isReleaseBuild()) {
+    return LIBRARY_VERSION.replace("-SNAPSHOT", "")
+  } else {
+    return LIBRARY_VERSION;
+  }
+}
+
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'
@@ -34,7 +46,7 @@ allprojects {
   }
 
   group = GROUPID
-  version = LIBRARY_VERSION
+  version = getLibraryVersion()
 }
 
 subprojects {
