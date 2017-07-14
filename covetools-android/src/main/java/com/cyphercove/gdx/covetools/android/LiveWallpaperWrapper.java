@@ -26,7 +26,8 @@ import com.badlogic.gdx.backends.android.AndroidLiveWallpaper;
 import com.badlogic.gdx.backends.android.AndroidWallpaperListener;
 import com.badlogic.gdx.math.MathUtils;
 
-/** Wrap a {@link LiveWallpaperListener} in a LiveWallpaperWrapper when passing it to
+/**
+ * Wrap a {@link LiveWallpaperListener} in a LiveWallpaperWrapper when passing it to
  * {@link AndroidLiveWallpaper#initialize(ApplicationListener, AndroidApplicationConfiguration) initialize()} to enable its
  * extra features.
  *
@@ -35,29 +36,61 @@ import com.badlogic.gdx.math.MathUtils;
 public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpaperListener,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    /** A listener that provides convenient non-core project access to events on the GLThread */
-    public interface UpdateListener {
+    /**
+     * A listener that provides convenient non-core project access to events on the GLThread
+     */
+    public interface WallpaperEventListener {
+        /**
+         * Called immediately after {@code create()} is called on the live wallpaper.
+         *
+         * @param liveWallpaper The wrapped live wallpaper.
+         */
+        void onPostCreate(LiveWallpaperListener liveWallpaper);
+
         /**
          * Called once per render loop immediately before {@code render()} is called on the live wallpaper.
-         * @param deltaTime The frame delta time reported by LibGDX.
+         *
+         * @param liveWallpaper The wrapped live wallpaper.
+         * @param deltaTime     The frame delta time reported by LibGDX.
          */
-        void onUpdate(float deltaTime);
+        void onRender(LiveWallpaperListener liveWallpaper, float deltaTime);
 
-        /** Called on the GL thread immediately after the SharedPreferences have changed. */
-        void onSettingsChanged();
+        /**
+         * Called on the GL thread immediately after the SharedPreferences have changed.
+         *
+         * @param liveWallpaper The wrapped live wallpaper.
+         */
+        void onSettingsChanged(LiveWallpaperListener liveWallpaper);
+
+        /**
+         * Called when the user taps multiple times in the same spot within a small time window.
+         *
+         * @param tapCount The number of taps that occurred in the same location.
+         * @return True if the tap count should be reset.
+         */
+        boolean onMultiTap(int tapCount);
     }
 
     private LiveWallpaperListener liveWallpaper;
     private SharedPreferences sharedPreferences;
-    private UpdateListener updateListener;
+    private WallpaperEventListener wallpaperEventListener;
     private volatile boolean needSettingsUpdate;
 
+    // Screen offsets
     private float xOffset = 0.5f;
     private float yOffset;
     private float xOffsetFake = 0.5f;
     private float xOffsetFakeTarget = 0.5f;
     private static final float DIP_TO_XOFFSET_FAKE_RATIO = 750f;
     private float swipeXStart;
+
+    // Screen tapping
+    private int tapCount = 0;
+    private float timeSinceLastTap = 0;
+    private float multiTapMaxInterval = 0.35f;
+    private float firstTapX;
+    private float firstTapY;
+    private float tapThresholdDIP = 80;
 
     /**
      * Pixels per DIP unit.
@@ -79,14 +112,14 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
      * Wraps a LiveWallpaperListener in an ApplicationAdapter that can be passed to
      * {@link AndroidLiveWallpaper#initialize(ApplicationListener, AndroidApplicationConfiguration)}.
      *
-     * @param liveWallpaper The live wallpaper updateListener to wrap
-     * @param context The Android application context.
+     * @param liveWallpaper The live wallpaper wallpaperEventListener to wrap
+     * @param context       The Android application context.
      */
-    public LiveWallpaperWrapper(LiveWallpaperListener liveWallpaper, Context context){
+    public LiveWallpaperWrapper(LiveWallpaperListener liveWallpaper, Context context) {
         this(liveWallpaper, context, null);
     }
 
-    public LiveWallpaperWrapper(LiveWallpaperListener liveWallpaper, Context context, SharedPreferences sharedPreferences){
+    public LiveWallpaperWrapper(LiveWallpaperListener liveWallpaper, Context context, SharedPreferences sharedPreferences) {
         this(liveWallpaper, context, sharedPreferences, null);
     }
 
@@ -94,24 +127,24 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
      * Wraps a LiveWallpaperListener in an ApplicationAdapter that can be passed to
      * {@link AndroidLiveWallpaper#initialize(ApplicationListener, AndroidApplicationConfiguration)}.
      *
-     * @param liveWallpaper The live wallpaper updateListener to wrap
-     * @param context The Android application context.
-     * @param sharedPreferences Optional SharedPreferences to watch for changes, which will be reported in
-     * {@link LiveWallpaperListener#onSettingsChanged()}.
-     * @param updateListener Optional listener to be called once per frame before {@code render()}.
+     * @param liveWallpaper          The live wallpaper wallpaperEventListener to wrap
+     * @param context                The Android application context.
+     * @param sharedPreferences      Optional SharedPreferences to watch for changes, which will be reported in
+     *                               {@link LiveWallpaperListener#onSettingsChanged()}.
+     * @param wallpaperEventListener Optional listener to events related to the live wallpaper.
      */
     public LiveWallpaperWrapper(LiveWallpaperListener liveWallpaper, Context context, SharedPreferences sharedPreferences,
-                                UpdateListener updateListener) {
+                                WallpaperEventListener wallpaperEventListener) {
         this.liveWallpaper = liveWallpaper;
         density = context.getResources().getDisplayMetrics().density;
         this.sharedPreferences = sharedPreferences;
         if (sharedPreferences != null)
             sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        this.updateListener = updateListener;
+        this.wallpaperEventListener = wallpaperEventListener;
     }
 
-    public void setUpdateListener(UpdateListener updateListener) {
-        this.updateListener = updateListener;
+    public void setWallpaperEventListener(WallpaperEventListener wallpaperEventListener) {
+        this.wallpaperEventListener = wallpaperEventListener;
     }
 
     /**
@@ -130,15 +163,16 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
 
         if (needSettingsUpdate) {
             needSettingsUpdate = false;
-            if (updateListener != null)
-                updateListener.onSettingsChanged();
+            if (wallpaperEventListener != null)
+                wallpaperEventListener.onSettingsChanged(liveWallpaper);
             liveWallpaper.onSettingsChanged();
         }
 
         updateSpecialXOffsets();
         handleTouch();
-        if (updateListener != null)
-            updateListener.onUpdate(Gdx.graphics.getDeltaTime());
+        handleMultiTaps();
+        if (wallpaperEventListener != null)
+            wallpaperEventListener.onRender(liveWallpaper, Gdx.graphics.getDeltaTime());
         liveWallpaper.render();
         liveWallpaper.render(xOffset, yOffset, xOffsetSmooth, xOffsetFake);
     }
@@ -189,7 +223,7 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
     @Override
     public void dispose() {
         liveWallpaper.dispose();
-        if (sharedPreferences != null){
+        if (sharedPreferences != null) {
             sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         }
     }
@@ -215,6 +249,9 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
     @Override
     public void create() {
         liveWallpaper.create();
+        if (wallpaperEventListener != null) {
+            wallpaperEventListener.onPostCreate(liveWallpaper);
+        }
     }
 
     @Override
@@ -232,7 +269,7 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
         liveWallpaper.resume();
     }
 
-    public final void handleTouch() {
+    private void handleTouch() {
         Input input = Gdx.input;
 
         if (input.justTouched()) {
@@ -249,7 +286,46 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
                 xOffsetFakeTarget = 1;
             swipeXStart = input.getX();
         }
+    }
 
+    private void handleMultiTaps() {
+        timeSinceLastTap += Gdx.graphics.getDeltaTime();
+        Input input = Gdx.input;
+
+        if (input.justTouched()) {
+            if (tapCount == 0) {
+                timeSinceLastTap = 0;
+                firstTapX = input.getX();
+                firstTapY = input.getY();
+                tapCount = 1;
+            } else if (input.isTouched(1) // Multi touches immediately cancel multi tap.
+                    || timeSinceLastTap > multiTapMaxInterval) { // Cancel if past time interval.
+                tapCount = 0;
+                return;
+            } else {
+                float tapThreshold = tapThresholdDIP * density;
+                float dx = firstTapX - input.getX();
+                float dy = firstTapY - input.getY();
+                if (dx * dx + dy * dy > tapThreshold * tapThreshold) { // outside threshold radius
+                    tapCount = 0;
+                    return;
+                }
+                timeSinceLastTap = 0;
+                tapCount++;
+                if (wallpaperEventListener != null){
+                    if (wallpaperEventListener.onMultiTap(tapCount))
+                        tapCount = 0;
+                }
+            }
+        } else if (input.isTouched(0)){
+            float tapThreshold = tapThresholdDIP * density;
+            float dx = firstTapX - input.getX(0);
+            float dy = firstTapY - input.getY(0);
+            if (dx * dx + dy * dy > tapThreshold * tapThreshold) { // swiped to outside threshold radius
+                tapCount = 0;
+                return;
+            }
+        }
     }
 }
 

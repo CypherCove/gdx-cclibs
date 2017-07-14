@@ -1,1 +1,5 @@
+dependencies {
+    compile "net.objecthunter:exp4j:$exp4jVersion"
+}
+
 apply from: '../publish.gradle'

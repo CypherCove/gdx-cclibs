@@ -1,5 +1,6 @@
 buildscript {
   repositories {
+    mavenLocal()
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     jcenter()
@@ -35,7 +36,8 @@ allprojects {
   apply plugin: 'idea'
 
   ext {
-    gdxVersion = '1.9.7-SNAPSHOT'
+    gdxVersion = '1.9.6'
+    exp4jVersion = '0.4.8'
   }
 
   repositories {
