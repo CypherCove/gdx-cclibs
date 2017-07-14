@@ -11,6 +11,8 @@ android {
         versionName "1.0"
     }
 
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
 }
 
 def getSrcDirs (){

@@ -69,6 +69,8 @@ configure([project(':covetools'), project(':flexbatch'), project(':gdxtokryo')])
     testCompile "junit:junit:$junitVersion"
   }
 
+  sourceCompatibility = 1.7
+  targetCompatibility = 1.7
 }
 
 project(':covetools-android') {
