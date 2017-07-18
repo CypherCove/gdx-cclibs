@@ -98,10 +98,9 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
     private float density;
 
     //Homescreen looping params
-    protected float xOffsetSmooth;
+    protected float xOffsetSmooth, xOffsetLooping;
     private float offsetDelta;
     private float previousOffset = 0.5f;
-    private float offsetAdder;
     private float offsetVelocity = 0;
     private float offsetMaxVelocity = 1.5f; //per second
     private float offsetMinVelocity = .4f; //per second
@@ -174,7 +173,7 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
         if (wallpaperEventListener != null)
             wallpaperEventListener.onRender(liveWallpaper, Gdx.graphics.getDeltaTime());
         liveWallpaper.render();
-        liveWallpaper.render(xOffset, yOffset, xOffsetSmooth, xOffsetFake);
+        liveWallpaper.render(xOffset, yOffset, xOffsetLooping, xOffsetFake);
     }
 
     private void updateSpecialXOffsets() {
@@ -182,12 +181,12 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
         //Handle xOffsetFake
         offsetDelta = xOffsetFakeTarget - xOffsetFake;
         offsetVelocity = offsetMaxVelocity * MathUtils.sin(offsetDelta * MathUtils.PI);
-        if (offsetDelta < 0) {//moving left
+        if (offsetDelta < 0) { // moving left
             offsetVelocity -= offsetMinVelocity;
-        } else if (offsetDelta > 0) {//moving right
+        } else if (offsetDelta > 0) { // moving right
             offsetVelocity += offsetMinVelocity;
         }
-        offsetAdder = offsetVelocity * Gdx.graphics.getDeltaTime();
+        float offsetAdder = offsetVelocity * Gdx.graphics.getDeltaTime();
         if (Math.abs(offsetAdder) >= Math.abs(offsetDelta)) {
             xOffsetFake = xOffsetFakeTarget;
         } else {
@@ -196,24 +195,33 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
 
         //Handle xOffsetSmooth
         offsetDelta = xOffset - xOffsetSmooth;
-        offsetVelocity = offsetMaxVelocity * MathUtils.sin(offsetDelta * MathUtils.PI);
-        if (offsetDelta < 0) {//moving left
+        offsetVelocity = offsetMaxVelocity*MathUtils.sin(offsetDelta*MathUtils.PI);
+        if (offsetDelta < 0){ // moving left
             offsetVelocity -= offsetMinVelocity;
-        } else if (offsetDelta > 0) {//moving right
+        } else if (offsetDelta > 0){ // moving right
             offsetVelocity += offsetMinVelocity;
         }
         offsetAdder = offsetVelocity * Gdx.graphics.getDeltaTime();
-        if (Math.abs(offsetAdder) >= Math.abs(offsetDelta)) {
+        if (Math.abs(offsetAdder) >= Math.abs(offsetDelta)){
             xOffsetSmooth = xOffset;
             catchingUp = false;
         } else {
             xOffsetSmooth += offsetAdder;
         }
 
-        if (!catchingUp) {
+        //Handle xOffsetLooping. Uses xOffset if not looping/catching up. Otherwise, use same value as xOffsetSmooth.
+        if (!catchingUp){
             final float offsetChange = xOffset - previousOffset;
             if (offsetChange >= DELTA_OFFSET_MIN_LOOPING || -offsetChange >= DELTA_OFFSET_MIN_LOOPING)
-                catchingUp = true;
+                catchingUp=true;
+        }
+        if (!catchingUp){ //Not catching up. Just pass through xOffset.
+            xOffsetLooping = xOffset;
+        } else if (offsetDelta == 0){  //Just caught up.
+            xOffsetLooping = xOffset;
+            catchingUp = false;
+        } else {  //Still catching up, so use smoothed value.
+            xOffsetLooping = xOffsetSmooth;
         }
 
         previousOffset = xOffset;

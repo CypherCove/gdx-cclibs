@@ -29,20 +29,24 @@ public interface LiveWallpaperListener extends ApplicationListener {
      * An alternate render method that provides additional live wallpaper data. This method is called immediately
      * following {@link #render()}.
      *
-     * @param xOffset The x offset reported by Android's live wallpaper engine
-     * @param yOffset The y offset reported by Android's live wallpaper engine
-     * @param xOffsetSmoothLooping The x offset reported by Android's live wallpaper engine, with smoothing applied. Some
-     *                             Android launchers can loop around from the last to the first home screen, and this provides
-     *                             a graceful transition for that change by smoothly panning the offset back across.
-     * @param xOffsetFake A fake x offset based on screen swipes by the user. This can compensate for launchers that
-     *                    do not change the xOffset.
+     * @param xOffset        The x offset reported by Android's live wallpaper engine
+     * @param yOffset        The y offset reported by Android's live wallpaper engine
+     * @param xOffsetLooping Some Android launchers can loop around from the last to the first home screen, and this provides
+     *                       a graceful transition for that change by smoothly panning the offset back across.
+     * @param xOffsetFake    A fake x offset based on screen swipes by the user. This can compensate for launchers that
+     *                       do not change the xOffset.
      */
-    void render (float xOffset, float yOffset, float xOffsetSmoothLooping, float xOffsetFake);
+    void render(float xOffset, float yOffset, float xOffsetLooping, float xOffsetFake);
 
-    /** Called after 'isPreview' state had changed. This is generally called a single time at application initialization.
-     * @param isPreview Whether the current application is in preview mode. */
-    void onPreviewStateChange (boolean isPreview);
+    /**
+     * Called after 'isPreview' state had changed. This is generally called a single time at application initialization.
+     *
+     * @param isPreview Whether the current application is in preview mode.
+     */
+    void onPreviewStateChange(boolean isPreview);
 
-    /** Called when the application's shared preferences are modified. */
+    /**
+     * Called when the application's shared preferences are modified.
+     */
     void onSettingsChanged();
 }
