@@ -46,10 +46,8 @@ public class AssignmentAssetManager extends AssetManager {
 
 	private final ObjectSet<Object> queuedContainers = new ObjectSet<Object>();
 	private final ObjectSet<Object> loadedContainers = new ObjectSet<Object>();
-	private final ObjectMap<Object, ObjectMap<Field, AssetDescriptor<?>>> containersFieldsToAssets 
-		= new ObjectMap<Object, ObjectMap<Field, AssetDescriptor<?>>>();
-	private final ObjectMap<Object, ObjectMap<Object[], AssetDescriptor<?>[]>> containersFieldsToAssetArrays 
-		= new ObjectMap<Object, ObjectMap<Object[], AssetDescriptor<?>[]>>();
+	private final ObjectMap<Object, ObjectMap<Field, AssetDescriptor<?>>> containersFieldsToAssets = new ObjectMap<>();
+	private final ObjectMap<Object, ObjectMap<Object[], AssetDescriptor<?>[]>> containersFieldsToAssetArrays = new ObjectMap<>();
 
 	public AssignmentAssetManager() {
 		super();
@@ -299,6 +297,21 @@ public class AssignmentAssetManager extends AssetManager {
 	}
 	
 	private boolean isReferenced (AssetDescriptor<?> asset){
+		// Checks equality of file names of the AssetDescriptor (same behavior as AssetManager)
+		for (ObjectMap<Field, AssetDescriptor<?>> assets : containersFieldsToAssets.values()){
+			for (AssetDescriptor<?> assetDescriptor : assets.values())
+				if (assetDescriptor.fileName.equals(asset.fileName))
+					return true;
+		}
+
+		for (ObjectMap<Object[], AssetDescriptor<?>[]> assetArrays : containersFieldsToAssetArrays.values()){
+			for (AssetDescriptor<?>[] assetArray : assetArrays.values()){
+				for (AssetDescriptor<?> assetDescriptor : assetArray)
+					if (assetDescriptor.fileName.equals(asset.fileName))
+						return true;
+			}
+		}
+
 		return false;
 	}
 
