@@ -68,3 +68,50 @@ Finally, you can optionally implement the AssetContainer interface to specify a 
 			eggTextureRegion = atlas.findRegion("egg");
 		}
     }
+    
+## JsonFieldUpdater
+
+This class lets you update field values (by reflection) by modifying a Json file and loading it at runtime. I use this to tweak values quickly without rebuilding the game over and over. I create an input listener that calls `jsonFieldUpdater.readFieldsToObjects(...)` in response to a key press. For example:
+
+    public class MyGlobalParameters {
+        public static float gravity = 25f;
+    }
+    
+If the above were one of your classes, you could create a Json file like this:
+
+    {
+        MyGlobalParameters: {
+            gravity : 9.8
+        }
+    }
+
+And cause the new value(s) to be loaded at runtime by calling:
+
+    jsonFieldUpdater.readFieldsToObjects(Gdx.files.internal("myParameters.json"), MyGlobalParameters.class)
+    
+## Live Wallpapers
+
+One of LibGDX's selling points is the ability to develop a game using desktop builds and then deploying to Android with minimal extra work. CoveTools provides some classes that help you do the same with live wallpapers.
+
+The first step is to make your base application listener derive from LiveWallpaperListener instead of ApplicationListener. This gives you a few extra methods to fill out:
+
+* Use `void render(float xOffset, float yOffset, float xOffsetLooping, float xOffsetFake);` instead of `render()`, and it will provide you with the xOffset provided by Android's launcher. On the desktop build, it will simulate the xOffset scrolling left and right when you drag in the window.
+
+* Use `void onPreviewStateChange(boolean isPreview);` to determine if the wallpaper is in preview mode on Android.
+    
+* Use `onSettingsChanged()`to perform any necessary updates if the user has changed the settings on Android.
+
+For your desktop build, wrap the listener in a DesktopLiveWallpaperWrapper when passing it to the LwjglApplication constructor:
+
+    new LwjglApplication(new DesktopLiveWallpaperWrapper(new MyLiveWallpaperListener()), config);
+
+For your Android build, wrap the listener in a LiveWallpaperWrapper before handing it to `initialize(...)`. The wrapper has some additional parameters to pass to the constructor. The application context is used to retrieve display parameters. The optional SharedPreferences will be listened to for changes. The optional WallpaperEventListener will allow you to respond to some live wallpaper events on the LibGDX (OpenGL) thread. I use this to initialize values from the Android settings right before the first render call, and to update those values when the settings change.
+
+    initialize(new LiveWallpaperWrapper(new MyLiveWallpaperListener(), getApplicationContext(), 
+        mySharedPreferences, myEventListener), config);
+
+You can also easily use your wallpaper as a Daydream, aka screensaver by wrapping it in a DaydreamWrapper before passing it to `AndroidDaydream.initialize(...)` :
+
+    initialize(new DaydreamWrapper(new MyLiveWallpaperListener(), myEventListener), config);
+    
+A daydream shouldn't be running while a user is changing settings, so there is no option to pass a SharedPreferences instance.
