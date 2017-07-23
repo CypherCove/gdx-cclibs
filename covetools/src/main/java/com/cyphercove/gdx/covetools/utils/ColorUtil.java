@@ -174,6 +174,16 @@ public class ColorUtil {
     }
 
     /**
+     * Sets the hue of the color to the given value, normalized across colors from 0 to 1.
+     *
+     * @return The modified input color.
+     */
+    public static Color setHue(Color color, float hue) {
+        toHSV(color);
+        return setFromHSV(color, hue % 1f, color.g, color.b);
+    }
+
+    /**
      * Scales the saturation of the color.
      *
      * @return The modified input color.
@@ -184,6 +194,16 @@ public class ColorUtil {
     }
 
     /**
+     * Sets the saturation of the color, leaving hue and value constant.
+     *
+     * @return The modified input color.
+     */
+    public static Color setSaturation(Color color, float saturation) {
+        toHSV(color);
+        return setFromHSV(color, color.r, saturation, color.b);
+    }
+
+    /**
      * Scales the value of the color.
      *
      * @return The modified input color.
@@ -191,6 +211,16 @@ public class ColorUtil {
     public static Color scaleValue(Color color, float scale) {
         toHSV(color);
         return setFromHSV(color, color.r, color.g, Math.min(color.b * scale, 1f));
+    }
+
+    /**
+     * Sets the value of the color, leaving the hue and saturation constant.
+     *
+     * @return The modified input color.
+     */
+    public static Color setValue(Color color, float value) {
+        toHSV(color);
+        return setFromHSV(color, color.r, color.g, value);
     }
 
     public static final Color TMP = new Color();
