@@ -198,6 +198,20 @@ public class FlexBatch<T extends Batchable> implements Disposable {
 		shader.end();
 	}
 
+	/** Returns the render context, which can be used to modify drawing parameters for the next batch flush. This must
+	 * only be accessed between {@link #begin()} and {@link #end()}. Changes to the render parameters will override any
+	 * that have been set by batchables that are queued and awaiting the next flush, with the exception of the last batchable
+	 * drawn with {@link #draw()}, if there is one. Subsequent batchables might reverse these changes in their
+	 * {@link Batchable#prepareContext(RenderContextAccumulator, int, int)} methods, and therefore trigger a flush before
+	 * they are queued. For example, {@link com.cyphercove.gdx.flexbatch.batchable.Quad3D} manages blending parameters
+	 * per batchable, and therefore setting blend parameters on the RenderContextAccumulator will have no effect.
+	 *
+	 * @return the render context, whose parameters may be set to affect drawing. */
+	public RenderContextAccumulator getRenderContext (){
+		if (!drawing) throw new IllegalStateException("Render context must not be modified except between begin() and end().");
+		return renderContext;
+	}
+
 	private void drawPending () {
 		havePendingInternal = false;
 		draw(internalBatchable);
