@@ -23,7 +23,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
 /**
- * @Deprecated Not ready. Awaiting LibGDX 1.9.7 and WindowedMeanSerializer.
+ * Not ready. Awaiting LibGDX 1.9.7 and WindowedMeanSerializer.
  */
 public class FloatCounterSerializer extends Serializer<FloatCounter> {
     @Override
