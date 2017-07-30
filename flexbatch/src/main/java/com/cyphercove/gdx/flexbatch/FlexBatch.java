@@ -77,7 +77,8 @@ public class FlexBatch<T extends Batchable> implements Disposable {
     private final float[] vertices;
     private final short[] triangles;
     private int vertIdx, triIdx;
-    private int previousVertIdx, previousTriIdx;
+    private int previousTriIdx;
+    private boolean reflushUsed;
     private int unfixedVertCount; // only for non-fixed indices, for
     // optimization
     private final int maxVertices, vertexSize, maxIndices;
@@ -92,6 +93,7 @@ public class FlexBatch<T extends Batchable> implements Disposable {
      * Number of render calls since the last {@link #begin()}.
      **/
     public int renderCalls = 0;
+    private boolean flushCalled;
     /**
      * Number of rendering calls, ever. Will not be reset unless set manually.
      **/
@@ -190,10 +192,14 @@ public class FlexBatch<T extends Batchable> implements Disposable {
         applyMatrices();
 
         drawing = true;
+        flushCalled = false;
+        reflushUsed = false;
     }
 
     public void end () {
         if (!drawing) throw new IllegalStateException("begin() must be called before end().");
+        if (!reflushUsed && !flushCalled) // didn't reflush and didn't draw anything, so next reflush should use 0 count.
+            previousTriIdx = 0;
         flush();
         drawing = false;
 
@@ -432,6 +438,7 @@ public class FlexBatch<T extends Batchable> implements Disposable {
 
     public void flush () {
         if (havePendingInternal) drawPending();
+        flushCalled = true;
         if (vertIdx == 0) {
             if (drawing) renderContext.executeChanges(); // first item
             return;
@@ -450,7 +457,6 @@ public class FlexBatch<T extends Batchable> implements Disposable {
 
         renderContext.executeChanges(); // might have flushed for new item
 
-        previousVertIdx = vertIdx;
         previousTriIdx = triIdx;
         vertIdx = 0;
         unfixedVertCount = 0;
@@ -461,14 +467,17 @@ public class FlexBatch<T extends Batchable> implements Disposable {
 
     /** Flushes the same triangles drawn the last time a flush occurred. This is an expert method with no error checks. It
      * provides a way to avoid re-submitting the batchable data for drawing if none of them have changed since the last
-     * flush. Note that there are several reasons the previous flush may have occurred other than a manual call to
-     * {@link #flush()}, so care must be taken to be aware of these and avoid them if necessary.
+     * flush and nothing in the render context has changed either (textures, blend modes, etc.). Note that there are
+     * several reasons the previous flush may have occurred other than a manual call to {@link #flush()}, so care must
+     * be taken to be aware of these and avoid them if necessary.
      */
     public void repeatPreviousFlush (){
-        mesh.render(shader, GL20.GL_TRIANGLES, 0, previousTriIdx);
-        renderContext.executeChanges();
-        renderCalls++;
-        totalRenderCalls++;
+        if (previousTriIdx != 0) {
+            mesh.render(shader, GL20.GL_TRIANGLES, 0, previousTriIdx);
+            renderCalls++;
+            totalRenderCalls++;
+        }
+        reflushUsed = true;
     }
 
     public ShaderProgram getShader () {
