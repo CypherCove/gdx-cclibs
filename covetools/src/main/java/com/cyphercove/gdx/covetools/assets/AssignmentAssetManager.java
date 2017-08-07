@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cyphercove.gdx.covetools.assets;
 
-import java.lang.annotation.*;
 import java.lang.reflect.Array;
 import java.security.AccessControlException;
 
@@ -336,55 +335,6 @@ public class AssignmentAssetManager extends AssetManager {
         }
 
         return false;
-    }
-
-    /**
-     * Annotation for a field to be populated with a reference to the specified asset. A path for the asset must be provided. An
-     * AssetManagerParameters may be provided using {@link Assets#parameter()}. Parameters are specified by field name, and should already be
-     * populated before loading. The parameter field is assumed to be in the same class as the asset, unless a fully qualified name is given
-     * for a static field.
-     */
-    @Documented
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    static public @interface Asset {
-        public String value (); // the path
-
-        public String parameter () default "";
-    }
-
-    /**
-     * Annotation for an array field to be populated with references to the assets. An array of asset paths must be provided. A single shared
-     * AssetManagerParameters may be provided using {@link Assets#parameter()}, or an array of an array of AssetManagerParameters may be
-     * specified using {@link Assets#parameters()} (array sizes must match). Parameters are specified by field name, and should already be
-     * populated before loading. The parameter field is assumed to be in the same class as the asset, unless a fully qualified name is given for
-     * a static field.
-     */
-    @Documented
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    static public @interface Assets {
-        public String[] value (); // the paths
-
-        public String[] parameters () default {};
-
-        public String parameter () default "";
-    }
-
-    /**
-     * Optional interface for an AssetContainer, providing a loading callback and other functionality.
-     */
-    public interface AssetContainer {
-        /**
-         * @return A path string that will prepended to all asset paths in this container. If a directory, a trailing slash must be included.
-         * May return null to prepend nothing.
-         */
-        String getAssetPathPrefix ();
-
-        /**
-         * Called when the AssetManager has finished loading all assets and populated the annotated asset fields in this container.
-         */
-        void onAssetsLoaded ();
     }
 
 }

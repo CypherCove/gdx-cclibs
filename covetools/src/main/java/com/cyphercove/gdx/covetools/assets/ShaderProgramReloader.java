@@ -39,8 +39,8 @@ public class ShaderProgramReloader {
         Class<?> containerType = assetContainer.getClass();
         Field[] fields = ClassReflection.getDeclaredFields(containerType);
         String pathPrepend = null;
-        if (assetContainer instanceof AssignmentAssetManager.AssetContainer) {
-            pathPrepend = ((AssignmentAssetManager.AssetContainer) assetContainer).getAssetPathPrefix();
+        if (assetContainer instanceof AssetContainer) {
+            pathPrepend = ((AssetContainer) assetContainer).getAssetPathPrefix();
             if (pathPrepend != null && pathPrepend.equals(""))
                 pathPrepend = null;
         }
@@ -51,9 +51,9 @@ public class ShaderProgramReloader {
         // Load redundant copies of the shaders to check for errors, then unload. Abort on any error.
         outer:
         for (Field field : fields) {
-            com.badlogic.gdx.utils.reflect.Annotation assetAnnotation = field.getDeclaredAnnotation(AssignmentAssetManager.Asset.class);
+            com.badlogic.gdx.utils.reflect.Annotation assetAnnotation = field.getDeclaredAnnotation(Asset.class);
             if (assetAnnotation != null && field.getType() == ShaderProgram.class) {
-                AssignmentAssetManager.Asset asset = assetAnnotation.getAnnotation(AssignmentAssetManager.Asset.class);
+                Asset asset = assetAnnotation.getAnnotation(Asset.class);
                 String fileName = asset.value();
                 if (pathPrepend != null)
                     fileName = pathPrepend + fileName;
@@ -67,10 +67,10 @@ public class ShaderProgramReloader {
                 newProgram.dispose();
                 continue;
             }
-            com.badlogic.gdx.utils.reflect.Annotation assetsAnnotation = field.getDeclaredAnnotation(AssignmentAssetManager.Assets.class);
+            com.badlogic.gdx.utils.reflect.Annotation assetsAnnotation = field.getDeclaredAnnotation(Assets.class);
             if (assetsAnnotation != null) {
                 Class<?> assetType = field.getType().getComponentType();
-                AssignmentAssetManager.Assets assets = assetsAnnotation.getAnnotation(AssignmentAssetManager.Assets.class);
+                Assets assets = assetsAnnotation.getAnnotation(Assets.class);
                 String[] fileNames = assets.value();
                 if (pathPrepend != null) {
                     for (int i = 0; i < fileNames.length; i++)

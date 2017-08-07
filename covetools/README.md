@@ -18,6 +18,8 @@ CoveTools is compatible with LibGDX 1.9.5+.
 
 CoveTools does not (yet) support GWT.
 
+See [CHANGES.md](Changes.md) for a list of breaking changes for newer releases.
+
 ## AssignmentAssetManager
 
 AssignmentAssetManager is an AssetManager that is designed to reduce typing and redundancy as much as possible. You set up a container class for your assets by making fields for each asset:

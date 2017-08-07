@@ -36,7 +36,9 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.cyphercove.gdx.Example;
 import com.cyphercove.gdx.covetools.assets.AssignmentAssetManager;
-import com.cyphercove.gdx.covetools.assets.AssignmentAssetManager.*;
+import com.cyphercove.gdx.covetools.assets.Asset;
+import com.cyphercove.gdx.covetools.assets.Assets;
+import com.cyphercove.gdx.covetools.assets.AssetContainer;
 
 public class AssignmentAssetManagerTest extends Example {
 
