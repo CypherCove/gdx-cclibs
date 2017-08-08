@@ -18,7 +18,7 @@ CoveTools is compatible with LibGDX 1.9.5+.
 
 CoveTools does not (yet) support GWT.
 
-See [CHANGES.md](Changes.md) for a list of breaking changes for newer releases.
+See [CHANGES.md](Changes.md) for the change log, which lists breaking changes and LibGDX version increases.
 
 ## AssignmentAssetManager
 

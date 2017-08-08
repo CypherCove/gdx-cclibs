@@ -14,6 +14,8 @@ FlexBatch is compatible with LibGDX 1.9.5+. The SNAPSHOT version will be kept up
 
 FlexBatch does not (yet) support GWT.
 
+See [CHANGES.md](Changes.md) for the change log, which lists breaking changes and LibGDX version increases.
+
 ## Basic Usage
 A **FlexBatch** is capable of drawing a specific type of **Batchable**, so it is instantiated using that Batchable. For example, to create a FlexBatch that can draw the included **Quad2D** type of Batchable:
 
