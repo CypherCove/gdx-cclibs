@@ -591,6 +591,22 @@ public class FlexBatch<T extends Batchable> implements Disposable {
         return drawing;
     }
 
+    /**
+     * @return The number of vertices that can be drawn between flushes.
+     */
+    public int getVertexCapacity (){
+        return vertices.length / vertexSize;
+    }
+
+    /**
+     * @return The number of batchables that can be drawn between flushes, or 0 if the batchable is not a {@link FixedSizeBatchable}.
+     */
+    public int getBatchableCapacity (){
+        if (fixedIndices)
+            return vertices.length / (vertexSize * verticesPerBatchable);
+        return 0;
+    }
+
     public void dispose () {
         mesh.dispose();
     }
