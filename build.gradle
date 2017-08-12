@@ -36,7 +36,7 @@ allprojects {
   apply plugin: 'idea'
 
   ext {
-    gdxVersion = '1.9.6'
+    gdxVersion = '1.9.7-SNAPSHOT'
     exp4jVersion = '0.4.8'
   }
 
