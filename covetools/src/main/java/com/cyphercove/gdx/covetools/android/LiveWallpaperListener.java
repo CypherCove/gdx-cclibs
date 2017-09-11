@@ -46,6 +46,13 @@ public interface LiveWallpaperListener extends ApplicationListener {
     void onPreviewStateChange(boolean isPreview);
 
     /**
+     * Called in response to an icon dropping on the home screen. Not all Android launcher apps are guaranteed to support this.
+     * @param x
+     * @param y
+     */
+    void onIconDropped (int x, int y);
+
+    /**
      * Called when the application's shared preferences are modified.
      */
     void onSettingsChanged();

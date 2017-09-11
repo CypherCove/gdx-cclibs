@@ -517,7 +517,7 @@ public class FlexBatch<T extends Batchable> implements Disposable {
         renderContext.setBlendFunction(srcFunc, dstFunc);
     }
 
-    public void setBlendFunction (int srcColorFunc, int dstColorFunc, int srcAlphaFunc, int dstAlphaFunc) {
+    public void setBlendFunctionSeparate (int srcColorFunc, int dstColorFunc, int srcAlphaFunc, int dstAlphaFunc) {
         if (renderContext.getBlendFuncSrcColor() == srcColorFunc && renderContext.getBlendFuncDstColor() == dstColorFunc
                 && renderContext.getBlendFuncSrcAlpha() == srcAlphaFunc && renderContext.getBlendFuncDstAlpha() == dstAlphaFunc)
             return;

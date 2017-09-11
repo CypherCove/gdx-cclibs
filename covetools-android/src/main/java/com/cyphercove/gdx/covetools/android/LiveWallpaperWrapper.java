@@ -255,6 +255,11 @@ public class LiveWallpaperWrapper implements ApplicationListener, AndroidWallpap
     }
 
     @Override
+    public void iconDropped (int x, int y) {
+        liveWallpaper.onIconDropped(x, y);
+    }
+
+    @Override
     public void create() {
         liveWallpaper.create();
         if (wallpaperEventListener != null) {
