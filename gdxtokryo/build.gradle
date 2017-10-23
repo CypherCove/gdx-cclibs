@@ -1,5 +1,5 @@
 dependencies {
-    compile "com.esotericsoftware:kryo:3.0.3"
+    compile "com.esotericsoftware:kryo:4.0.1"
     testCompile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
 
