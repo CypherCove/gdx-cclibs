@@ -37,7 +37,7 @@ public class ObjectIntMapSerializer extends Serializer<ObjectIntMap> {
     public void write (Kryo kryo, Output output, ObjectIntMap map) {
         int length = map.size;
         output.writeVarInt(length, true);
-        kryo.writeClass(output, Object.class); // in case future version of ObjectIntMap supports type awareness
+        output.writeBoolean(false); // whether type is written (in case future version of ObjectIntMap supports type awareness)
 
         Serializer keySerializer = null;
         if (keyGenericType != null) {
@@ -61,7 +61,7 @@ public class ObjectIntMapSerializer extends Serializer<ObjectIntMap> {
 
     public ObjectIntMap read (Kryo kryo, Input input, Class<ObjectIntMap> type) {
         int length = input.readVarInt(true);
-        kryo.readClass(input); // currently unused
+        input.readBoolean(); // currently unused
         ObjectIntMap map = create(length);
 
         Class keyClass = null;

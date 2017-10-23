@@ -37,7 +37,7 @@ public class LongMapSerializer extends Serializer<LongMap> {
     public void write (Kryo kryo, Output output, LongMap map) {
         int length = map.size;
         output.writeVarInt(length, true);
-        kryo.writeClass(output, Object.class); // in case future version of LongMap supports type awareness
+        output.writeBoolean(false); // whether type is written (in case future version of LongMap supports type awareness)
 
         Serializer valueSerializer = null;
         if (valueGenericType != null) {
@@ -57,7 +57,7 @@ public class LongMapSerializer extends Serializer<LongMap> {
 
     public LongMap read (Kryo kryo, Input input, Class<LongMap> type) {
         int length = input.readVarInt(true);
-        kryo.readClass(input); // currently unused
+        input.readBoolean(); // currently unused
         LongMap map = new LongMap(length);
 
         Class valueClass = null;

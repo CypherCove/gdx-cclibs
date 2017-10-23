@@ -39,8 +39,7 @@ public class IdentityMapSerializer extends Serializer<IdentityMap> {
     public void write (Kryo kryo, Output output, IdentityMap map) {
         int length = map.size;
         output.writeVarInt(length, true);
-        kryo.writeClass(output, Object.class); // in case future version of IdentityMap supports type awareness
-        kryo.writeClass(output, Object.class); // in case future version of IdentityMap supports type awareness
+        output.writeBoolean(false); // whether type is written (in case future version of IdentityMap supports type awareness)
 
         Serializer keySerializer = null;
         if (keyGenericType != null) {
@@ -68,8 +67,7 @@ public class IdentityMapSerializer extends Serializer<IdentityMap> {
 
     public IdentityMap read (Kryo kryo, Input input, Class<IdentityMap> type) {
         int length = input.readVarInt(true);
-        kryo.readClass(input); // currently unused
-        kryo.readClass(input); // currently unused
+        input.readBoolean(); // currently unused
         IdentityMap map = new IdentityMap(length);
 
         Class keyClass = null;

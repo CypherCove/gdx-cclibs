@@ -185,7 +185,7 @@ public abstract class GdxToKryoTest extends TestCase {
             ArrayMap<?,?> _a = (ArrayMap<?,?>)a;
             ArrayMap<?,?> _b = (ArrayMap<?,?>)b;
             if (_a.size != _b.size)
-                return reportInequality(a, b);
+                return reportInequality("Size mismatch.\n", a, b);
             if (_a.ordered != _b.ordered)
                 return reportInequality(a, b);
             for (int i = 0; i < _a.size; i++) {
@@ -197,7 +197,7 @@ public abstract class GdxToKryoTest extends TestCase {
             Array<?> _a = (Array<?>)a;
             Array<?> _b = (Array<?>)b;
             if (_a.size != _b.size)
-                return reportInequality(a, b);
+                return reportInequality("Size mismatch.\n", a, b);
             for (int i = 0; i < _a.size; i++) {
                 if (!equals(_a.get(i), _b.get(i)))
                     return reportInequality(a, b);
@@ -207,13 +207,16 @@ public abstract class GdxToKryoTest extends TestCase {
             IdentityMap<?, ?> _a = (IdentityMap<?, ?>)a;
             IdentityMap<?, ?> _b = (IdentityMap<?, ?>)b;
             if (_a.size != _b.size)
-                return reportInequality(a, b);
+                return reportInequality("Size mismatch.\n", a, b);
             outer:
             for (IdentityMap.Entry entryA : _a.entries()){
+                boolean wasLogInequalities = logInequalities;
+                logInequalities = false; // Inequalities in the loop may be for non-matching pairs.
                 for (IdentityMap.Entry entryB : _b.entries()){
                     if (equals(entryA.key, entryB.key) && equals(entryA.value, entryB.value))
                         continue outer;
                 }
+                logInequalities = wasLogInequalities;
                 return reportInequality(a, b);
             }
             return true;
@@ -221,54 +224,73 @@ public abstract class GdxToKryoTest extends TestCase {
             LongMap<?> _a = (LongMap<?>)a;
             LongMap<?> _b = (LongMap<?>)b;
             if (_a.size != _b.size)
+                return reportInequality("Size mismatch.\n", a, b);
+            outer:
+            for (LongMap.Entry entryA : _a.entries()){
+                if (!_b.containsKey(entryA.key))
+                    return reportInequality(a, b);
+                boolean wasLogInequalities = logInequalities;
+                logInequalities = false; // Inequalities in the loop may be for non-matching pairs.
+                for (LongMap.Entry entryB : _b.entries()){
+                    if (equals(entryA.key, entryB.key) && equals(entryA.value, entryB.value))
+                        continue outer;
+                }
+                logInequalities = wasLogInequalities;
                 return reportInequality(a, b);
-            for (LongMap.Entry entry : _a.entries()){
-                if (!_b.containsKey(entry.key))
-                    return reportInequality(a, b);
-                if (!equals(entry.value, _b.get(entry.key)))
-                    return reportInequality(a, b);
             }
             return true;
         } else if (type == ObjectFloatMap.class){
             ObjectFloatMap<?> _a = (ObjectFloatMap<?>)a;
             ObjectFloatMap<?> _b = (ObjectFloatMap<?>)b;
             if (_a.size != _b.size)
+                return reportInequality("Size mismatch.\n", a, b);
+            outer:
+            for (ObjectFloatMap.Entry entryA : _a.entries()){
+                if (!_b.containsValue(entryA.value))
+                    return reportInequality(a, b);
+                boolean wasLogInequalities = logInequalities;
+                logInequalities = false; // Inequalities in the loop may be for non-matching pairs.
+                for (ObjectFloatMap.Entry entryB : _b.entries()){
+                    if (equals(entryA.key, entryB.key) && equals(entryA.value, entryB.value))
+                        continue outer;
+                }
+                logInequalities = wasLogInequalities;
                 return reportInequality(a, b);
-            for (ObjectFloatMap.Entry entry : _a.entries()){
-                if (!_b.containsValue(entry.value))
-                    return reportInequality(a, b);
-                if (!equals(entry.key, _b.findKey(entry.value)))
-                    return reportInequality(a, b);
             }
             return true;
         } else if (type == ObjectIntMap.class){
             ObjectIntMap<?> _a = (ObjectIntMap<?>)a;
             ObjectIntMap<?> _b = (ObjectIntMap<?>)b;
             if (_a.size != _b.size)
-                return reportInequality(a, b);
+                return reportInequality("Size mismatch.\n", a, b);
             outer:
             for (ObjectIntMap.Entry entryA : _a.entries()){
                 if (!_b.containsValue(entryA.value))
                     return reportInequality("b doesn't contain value " + entryA.value, a, b);
+                boolean wasLogInequalities = logInequalities;
+                logInequalities = false; // Inequalities in the loop may be for non-matching pairs.
                 for (ObjectIntMap.Entry entryB : _b.entries()){
-                    if (entryB.value == entryA.value && equals(entryA.key, entryB.key)){
+                    if (equals(entryA.key, entryB.key) && equals(entryA.value, entryB.value))
                         continue outer;
-                    }
                 }
-                return reportInequality("b doesn't contain entry " + entryA.key + ", " + entryA.value, a, b);
+                logInequalities = wasLogInequalities;
+                return reportInequality(a, b);
             }
             return true;
         } else if (type == ObjectMap.class){
             ObjectMap<?, ?> _a = (ObjectMap<?, ?>)a;
             ObjectMap<?, ?> _b = (ObjectMap<?, ?>)b;
             if (_a.size != _b.size)
-                return reportInequality(a, b);
+                return reportInequality("Size mismatch.\n", a, b);
             outer:
             for (ObjectMap.Entry entryA : _a.entries()){
+                boolean wasLogInequalities = logInequalities;
+                logInequalities = false; // Inequalities in the loop may be for non-matching pairs.
                 for (ObjectMap.Entry entryB : _b.entries()){
                     if (equals(entryA.key, entryB.key) && equals(entryA.value, entryB.value))
                         continue outer;
                 }
+                logInequalities = wasLogInequalities;
                 return reportInequality(a, b);
             }
             return true;
@@ -276,7 +298,7 @@ public abstract class GdxToKryoTest extends TestCase {
             ObjectSet<?> _a = (ObjectSet<?>)a;
             ObjectSet<?> _b = (ObjectSet<?>)b;
             if (_a.size != _b.size)
-                return reportInequality(a, b);
+                return reportInequality("Size mismatch.\n", a, b);
             outer:
             for (Object objectA : _a){
                 for (Object objectB : _b){
@@ -290,7 +312,7 @@ public abstract class GdxToKryoTest extends TestCase {
             OrderedMap<?, ?> _a = (OrderedMap<?, ?>)a;
             OrderedMap<?, ?> _b = (OrderedMap<?, ?>)b;
             if (_a.size != _b.size)
-                return reportInequality(a, b);
+                return reportInequality("Size mismatch.\n", a, b);
             OrderedMap.Entries iteratorA = _a.iterator();
             OrderedMap.Entries iteratorB = _b.iterator();
             while (iteratorA.hasNext()){
@@ -306,7 +328,7 @@ public abstract class GdxToKryoTest extends TestCase {
             OrderedSet<?> _a = (OrderedSet<?>)a;
             OrderedSet<?> _b = (OrderedSet<?>)b;
             if (_a.size != _b.size)
-                return reportInequality(a, b);
+                return reportInequality("Size mismatch.\n", a, b);
             OrderedSet.OrderedSetIterator iteratorA = _a.iterator();
             OrderedSet.OrderedSetIterator iteratorB = _b.iterator();
             while (iteratorA.hasNext()){
@@ -320,7 +342,7 @@ public abstract class GdxToKryoTest extends TestCase {
             Queue<?> _a = (Queue<?>)a;
             Queue<?> _b = (Queue<?>)b;
             if (_a.size != _b.size)
-                return reportInequality(a, b);
+                return reportInequality("Size mismatch.\n", a, b);
             for (int i = 0; i < _a.size; i++) {
                 if (!equals(_a.get(i), _b.get(i)))
                     return reportInequality(a, b);
@@ -330,7 +352,7 @@ public abstract class GdxToKryoTest extends TestCase {
             SortedIntList<?> _a = (SortedIntList<?>)a;
             SortedIntList<?> _b = (SortedIntList<?>)b;
             if (_a.size() != _b.size())
-                return reportInequality(a, b);
+                return reportInequality("Size mismatch.\n", a, b);
             for (int i = 0; i < _a.size(); i++) {
                 if (!equals(_a.get(i), _b.get(i)))
                     return reportInequality(a, b);
@@ -360,7 +382,7 @@ public abstract class GdxToKryoTest extends TestCase {
             else if (b == null)
                 System.err.println(String.format("First object (%s: %s) paired with null", a.getClass().getSimpleName(), a));
             else
-                System.err.println(String.format("Inequal objects:\n%s: %s\n%s: %s\n.", a.getClass().getSimpleName(), a, b.getClass().getSimpleName(), b));
+                System.err.println(String.format("Inequal objects:\n%s: %s\n%s: %s\n", a.getClass().getSimpleName(), a, b.getClass().getSimpleName(), b));
         }
         return false;
     }
@@ -372,7 +394,7 @@ public abstract class GdxToKryoTest extends TestCase {
             else if (b == null)
                 System.err.println(String.format("First object (%s: %s) paired with null", a.getClass().getSimpleName(), a));
             else
-                System.err.println(String.format("Inequal objects (%s):\n%s: %s\n%s: %s\n.", msg, a.getClass().getSimpleName(), a, b.getClass().getSimpleName(), b));
+                System.err.println(String.format("Inequal objects (%s):\n%s: %s\n%s: %s\n", msg, a.getClass().getSimpleName(), a, b.getClass().getSimpleName(), b));
         }
         return false;
     }

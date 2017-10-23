@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,8 +39,7 @@ public class ObjectMapSerializer<T extends ObjectMap> extends Serializer<T> {
     public void write (Kryo kryo, Output output, T map) {
         int length = map.size;
         output.writeVarInt(length, true);
-        kryo.writeClass(output, Object.class); // in case future version of ObjectMap supports type awareness
-        kryo.writeClass(output, Object.class); // in case future version of ObjectMap supports type awareness
+        output.writeBoolean(false); // whether type is written (in case future version of ObjectMap supports type awareness)
 
         Serializer keySerializer = null;
         if (keyGenericType != null) {
@@ -72,8 +71,7 @@ public class ObjectMapSerializer<T extends ObjectMap> extends Serializer<T> {
 
     public T read (Kryo kryo, Input input, Class<T> type) {
         int length = input.readVarInt(true);
-        kryo.readClass(input); // currently unused
-        kryo.readClass(input); // currently unused
+        input.readBoolean(); // currently unused
         T map = create(length);
 
         Class keyClass = null;

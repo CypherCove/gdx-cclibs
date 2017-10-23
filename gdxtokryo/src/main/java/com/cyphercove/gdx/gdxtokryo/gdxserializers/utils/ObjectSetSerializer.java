@@ -35,7 +35,7 @@ public class ObjectSetSerializer<T extends ObjectSet> extends Serializer<T> {
     public void write(Kryo kryo, Output output, T objectSet) {
         int length = objectSet.size;
         output.writeVarInt(length, true);
-        kryo.writeClass(output, Object.class); // in case future version of ObjectSet supports type awareness
+        output.writeBoolean(false); // whether type is written (in case future version of ObjectSet supports type awareness)
         Serializer serializer = null;
         if (genericType != null) {
             if (serializer == null) serializer = kryo.getSerializer(genericType);
@@ -57,7 +57,7 @@ public class ObjectSetSerializer<T extends ObjectSet> extends Serializer<T> {
     @Override
     public T read(Kryo kryo, Input input, Class<T> type) {
         int length = input.readVarInt(true);
-        kryo.readClass(input); // currently unused
+        input.readBoolean(); // currently unused
         T objectSet = create(length);
 
         kryo.reference(objectSet);
