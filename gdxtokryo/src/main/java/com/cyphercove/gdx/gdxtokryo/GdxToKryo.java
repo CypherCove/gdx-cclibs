@@ -80,6 +80,7 @@ public class GdxToKryo {
             throw new RuntimeException("Invalid group ID: " + groupID);
         switch(groupID){
             case 0:
+                kryo.register(Object.class); // Required because of use for backing arrays in some classes.
                 kryo.register(GraphHeader.class);
                 kryo.register(Color.class, new ColorSerializer());
                 kryo.register(OrthographicCamera.class, new OrthographicCameraSerializer());
@@ -145,6 +146,7 @@ public class GdxToKryo {
      * @param kryo
      */
     public static void registerAll (Kryo kryo){
+        kryo.register(Object.class); // Required because of use for backing arrays in some classes.
         kryo.register(GraphHeader.class);
         kryo.register(Color.class, new ColorSerializer());
         kryo.register(OrthographicCamera.class, new OrthographicCameraSerializer());
@@ -202,7 +204,7 @@ public class GdxToKryo {
     }
 
     /** Registers {@link GraphHeader} and all of the LibGDX classes supported by GdxToKryo with serializers, starting at
-     * the given ID and incrementing up from there. Currently, 50 classes are registered.
+     * the given ID and incrementing up from there. Currently, 51 classes are registered, including {@link Object}.
      * <p>
      * If backward compatibility is desired, it is recommended to reserve a block of unused registration IDs to support
      * future classes/serializers that GdxToKryo will support, perhaps <code>(startingID + 100)</code>. Alternatively,
@@ -212,6 +214,7 @@ public class GdxToKryo {
      */
     public static void registerAll (Kryo kryo, int startingID){
         int i = startingID;
+        kryo.register(Object.class, i++); // Required because of use for backing arrays in some classes.
         kryo.register(GraphHeader.class, i++);
         kryo.register(Color.class, new ColorSerializer(), i++);
         kryo.register(OrthographicCamera.class, new OrthographicCameraSerializer(), i++);

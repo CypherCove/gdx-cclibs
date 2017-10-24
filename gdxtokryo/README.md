@@ -4,19 +4,21 @@ These are tools and serializers for using LibGDX with Kyro. Although most LibGDX
 
 Forward compatibility with all future versions of LibGDX is not guaranteed, because that would require inefficient chunked encoding. If the LibGDX classes evolve to contain additional data, attempts will be made to offer options for writing the data in a forward compatible way.
 
-# GdxToKryo is not fully tested yet, so it is not ready for use.
+## UNTESTED LIBRARY
 
-I plan to release the initial version 1.1.0 very soon after the LibGDX 1.9.7 release.
+I am currently testing GdxToKryo in a large project, not yet released. When I am satisfied with its robustness, I will remove this notice. As of the 1.1.0 release, I do not intend to change the API, and it is theoretically ready for future compatibility. But I plan to more thoroughly test it before I commit to using it in a released product.
 
 ## Project dependency
 
 GdxToKryo is available via Maven Central. You can add it to your LibGDX project's base `build.gradle` under the `core` module's dependencies:
 
     compile "com.cyphercove.gdx:flexbatch:1.1.0-SNAPSHOT"
+    
+Do not use a `SNAPSHOT` version for a public release. Breaking changes may be made in between actual GdxToKryo releases.
 
 ## Compatibility
 
-The current version of GdxToKryo is compatible with Kryo 4.0.0+. If a Kryo major or minor version increase breaks anything, I'll determine at that time whether a separate branch of GdxToKryo should be created for supporting the newer Kryo.
+The current version of GdxToKryo is compatible with Kryo 4.0.1+. If a Kryo major or minor version increase breaks anything, I'll determine at that time whether a separate branch of GdxToKryo should be created for supporting the newer Kryo.
 
 GdxToKryo supports all versions of LibGDX 1.9.7 and up, and the goal is to update it so backward compatibility can be maintained indefinitely as LibGDX evolves.
 
@@ -41,6 +43,8 @@ If you are not concerned with saving data that can be read by a later release of
 If you want to preserve the ability to read old data in later revisions of your application, care must be taken to preserve backward compatibility. Class registration order in Kryo cannot be changed between releases of the application.
 
 #### Class registration
+
+GdxToKryo uses static methods to set up required class registrations. This includes all the classes for which GdxToKryo provides serializers, as well as Object (which is needed for some backing arrays in the gdx.utils serializers).
 
 To automatically register all of GdxToKryo's supported classes and their serializers, use:
 

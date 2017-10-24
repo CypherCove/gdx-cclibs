@@ -17,6 +17,7 @@ package com.cyphercove.gdx.gdxtokryo.gdxserializers.utils;
 
 import com.badlogic.gdx.utils.Queue;
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Registration;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -36,8 +37,8 @@ public class QueueSerializer extends Serializer<Queue> {
     @Override
     public void write(Kryo kryo, Output output, Queue queue) {
         output.writeVarInt(queue.size, true);
-        Class type = Object.class;
-        try { //TODO if Queue is updated accordingly, avoid reflection
+        Class type = null;
+        try { //TODO if Queue exposes backing array, avoid reflection
             Field valueArrayField = Queue.class.getField("values");
             type = valueArrayField.getClass().getComponentType();
         } catch (NoSuchFieldException e) {}
@@ -59,7 +60,8 @@ public class QueueSerializer extends Serializer<Queue> {
     @Override
     public Queue read(Kryo kryo, Input input, Class<Queue> type) {
         int length = input.readVarInt(true);
-        Class cls = kryo.readClass(input).getType();
+        Registration registration = kryo.readClass(input);
+        Class cls = registration == null ? Object.class : registration.getType();
         Queue queue = new Queue(length, cls);
         kryo.reference(queue);
         Class elementClass = null;
@@ -82,7 +84,7 @@ public class QueueSerializer extends Serializer<Queue> {
     @Override
     public Queue copy (Kryo kryo, Queue original) {
         Class type = Object.class;
-        try { //TODO if Queue is updated accordingly, avoid reflection
+        try { //TODO if Queue exposes backing array, avoid reflection
             Field valueArrayField = Queue.class.getField("values");
             type = valueArrayField.getClass().getComponentType();
         } catch (NoSuchFieldException e) {}
