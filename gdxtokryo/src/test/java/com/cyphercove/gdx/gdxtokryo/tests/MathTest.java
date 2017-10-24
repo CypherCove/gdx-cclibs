@@ -22,7 +22,7 @@ public class MathTest extends GdxToKryoTest {
     }
 
     public void testMathClasses (){
-        Object[] objects = new Object[22];
+        Object[] objects = new Object[23];
 
         objects[0] = new Affine2().setToTranslation(3, -5000).rotate(30);
         objects[1] = new Affine2().setToRotation(30).translate(15, -3);
@@ -66,6 +66,12 @@ public class MathTest extends GdxToKryoTest {
         objects[19] = new Rectangle(50f, 0.2f, 904f, 3f);
         objects[20] = new Vector2(50, -63.24f);
         objects[21] = new Vector3(56f, -14f, 0);
+
+        WindowedMean windowedMean = new WindowedMean(randSize());
+        for (int i = 0, n = (int)(randFloat() * 2f * windowedMean.getWindowSize()); i < n; i++) {
+            windowedMean.addValue(randFloat());
+        }
+        objects[22] = windowedMean;
 
         simpleRoundTrip(objects);
     }
