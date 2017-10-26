@@ -20,7 +20,7 @@ ext {
 }
 
 def isReleaseBuild() {
-  return false
+  return true
 }
 
 def getLibraryVersion() {
