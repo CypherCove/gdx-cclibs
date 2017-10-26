@@ -22,9 +22,6 @@ import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
-/**
- * Not ready. Awaiting LibGDX 1.9.7 and WindowedMeanSerializer.
- */
 public class FloatCounterSerializer extends Serializer<FloatCounter> {
     @Override
     public void write(Kryo kryo, Output output, FloatCounter floatCounter) {
@@ -43,7 +40,7 @@ public class FloatCounterSerializer extends Serializer<FloatCounter> {
         WindowedMean windowedMean = kryo.readObjectOrNull(input, WindowedMean.class);
         FloatCounter floatCounter = new FloatCounter(windowedMean == null ? 0 : windowedMean.getWindowSize());
         if (windowedMean != null) {
-            float[] windowedMeanValues = new float[5]; //TODO Use windowedMean.getWindowValues()
+            float[] windowedMeanValues = windowedMean.getWindowValues();
             for (float f : windowedMeanValues) { // restores the private WindowedMean
                 floatCounter.put(f);
             }
@@ -63,7 +60,7 @@ public class FloatCounterSerializer extends Serializer<FloatCounter> {
         WindowedMean windowedMean = original.mean;
         FloatCounter floatCounter = new FloatCounter(windowedMean == null ? 0 : windowedMean.getWindowSize());
         if (windowedMean != null) {
-            float[] windowedMeanValues = new float[5]; //TODO Use windowedMean.getWindowValues()
+            float[] windowedMeanValues = windowedMean.getWindowValues();
             for (float f : windowedMeanValues) { // restores the private WindowedMean
                 floatCounter.put(f);
             }

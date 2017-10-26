@@ -92,6 +92,7 @@ public class GdxToKryo {
                 kryo.register(CatmullRomSpline.class, new CatmullRomSplineSerializer());
                 kryo.register(Circle.class, new CircleSerializer());
                 kryo.register(Ellipse.class, new EllipseSerializer());
+                kryo.register(FloatCounter.class, new FloatCounterSerializer());
                 kryo.register(GridPoint2.class, new GridPoint2Serializer());
                 kryo.register(GridPoint3.class, new GridPoint3Serializer());
                 kryo.register(Matrix3.class, new Matrix3Serializer());
@@ -159,6 +160,7 @@ public class GdxToKryo {
         kryo.register(CatmullRomSpline.class, new CatmullRomSplineSerializer());
         kryo.register(Circle.class, new CircleSerializer());
         kryo.register(Ellipse.class, new EllipseSerializer());
+        kryo.register(FloatCounter.class, new FloatCounterSerializer());
         kryo.register(GridPoint2.class, new GridPoint2Serializer());
         kryo.register(GridPoint3.class, new GridPoint3Serializer());
         kryo.register(Matrix3.class, new Matrix3Serializer());
@@ -206,7 +208,7 @@ public class GdxToKryo {
     }
 
     /** Registers {@link GraphHeader} and all of the LibGDX classes supported by GdxToKryo with serializers, starting at
-     * the given ID and incrementing up from there. Currently, 51 classes are registered, including {@link Object}.
+     * the given ID and incrementing up from there. Currently, 57 classes are registered, including {@link Object}.
      * <p>
      * If backward compatibility is desired, it is recommended to reserve a block of unused registration IDs to support
      * future classes/serializers that GdxToKryo will support, perhaps <code>(startingID + 100)</code>. Alternatively,
@@ -228,6 +230,7 @@ public class GdxToKryo {
         kryo.register(CatmullRomSpline.class, new CatmullRomSplineSerializer(), i++);
         kryo.register(Circle.class, new CircleSerializer(), i++);
         kryo.register(Ellipse.class, new EllipseSerializer(), i++);
+        kryo.register(FloatCounter.class, new FloatCounterSerializer(), i++);
         kryo.register(GridPoint2.class, new GridPoint2Serializer(), i++);
         kryo.register(GridPoint3.class, new GridPoint3Serializer(), i++);
         kryo.register(Matrix3.class, new Matrix3Serializer(), i++);

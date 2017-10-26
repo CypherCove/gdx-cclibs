@@ -72,6 +72,23 @@ public abstract class GdxToKryoTest extends TestCase {
                 }
             }
             return true;
+        } else if (type == FloatCounter.class){
+            FloatCounter fcA = (FloatCounter)a;
+            FloatCounter fcB = (FloatCounter)b;
+            boolean wasLogInequalities = logInequalities;
+            logInequalities = false; // wait for logging by objec
+            boolean equal = equals(fcA.mean, fcB.mean);
+            logInequalities = wasLogInequalities;
+            if (!equal) {
+                reportInequality(a, b);
+                return false;
+            }
+            if (fcA.count != fcB.count || fcA.value != fcB.value || fcA.average != fcB.average || fcA.latest != fcB.latest ||
+                fcA.max != fcB.max || fcA.min != fcB.min){
+                reportInequality(a, b);
+                return false;
+            }
+            return true;
         } else if (type == WindowedMean.class){
             WindowedMean wmA = (WindowedMean)a;
             WindowedMean wmB = (WindowedMean)b;

@@ -150,7 +150,7 @@ public class PixmapSerializer extends SkippableSerializer<Pixmap> {
         output.writeInt(toFormatInt(pixmap.getFormat()), true);
         if (includeDrawingParams) {
             output.writeInt(toBlendingInt(pixmap.getBlending()), true);
-            output.writeInt(toFilterInt(Pixmap.Filter.BiLinear), true); //TODO use getFilter()
+            output.writeInt(toFilterInt(pixmap.getFilter()), true);
             output.writeInt(getPixmapColor(pixmap));
         }
 
@@ -281,7 +281,7 @@ public class PixmapSerializer extends SkippableSerializer<Pixmap> {
         copy.drawPixmap(original, 0, 0);
         if (includeDrawingParams) {
             copy.setBlending(original.getBlending());
-            //TODO copy.setFilter(original.getFilter());
+            copy.setFilter(original.getFilter());
             copy.setColor(getPixmapColor(original));
         } else { // restore defaults
             copy.setBlending(Pixmap.Blending.SourceOver);
