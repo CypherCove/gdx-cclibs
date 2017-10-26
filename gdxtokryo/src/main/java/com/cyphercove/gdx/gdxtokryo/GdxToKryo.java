@@ -104,6 +104,7 @@ public class GdxToKryo {
                 kryo.register(Rectangle.class, new RectangleSerializer());
                 kryo.register(Vector2.class, new Vector2Serializer());
                 kryo.register(Vector3.class, new Vector3Serializer());
+                kryo.register(WindowedMean.class, new WindowedMeanSerializer());
                 kryo.register(BoundingBox.class, new BoundingBoxSerializer());
                 kryo.register(Ray.class, new RaySerializer());
                 kryo.register(Segment.class, new SegmentSerializer());
@@ -170,6 +171,7 @@ public class GdxToKryo {
         kryo.register(Rectangle.class, new RectangleSerializer());
         kryo.register(Vector2.class, new Vector2Serializer());
         kryo.register(Vector3.class, new Vector3Serializer());
+        kryo.register(WindowedMean.class, new WindowedMeanSerializer());
         kryo.register(BoundingBox.class, new BoundingBoxSerializer());
         kryo.register(Ray.class, new RaySerializer());
         kryo.register(Segment.class, new SegmentSerializer());
@@ -238,6 +240,7 @@ public class GdxToKryo {
         kryo.register(Rectangle.class, new RectangleSerializer(), i++);
         kryo.register(Vector2.class, new Vector2Serializer(), i++);
         kryo.register(Vector3.class, new Vector3Serializer(), i++);
+        kryo.register(WindowedMean.class, new WindowedMeanSerializer(), i++);
         kryo.register(BoundingBox.class, new BoundingBoxSerializer(), i++);
         kryo.register(Ray.class, new RaySerializer(), i++);
         kryo.register(Segment.class, new SegmentSerializer(), i++);

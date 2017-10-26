@@ -61,13 +61,29 @@ public abstract class GdxToKryoTest extends TestCase {
         } else if (a instanceof Object[]){
             Object[] _a = (Object[])a;
             Object[] _b = (Object[])b;
-            if (_a.length != _b.length)
+            if (_a.length != _b.length) {
                 reportInequality(a, b);
+                return false;
+            }
             for (int i = 0; i < _a.length; i++) {
-                if (!equals(_a[i], _b[i]))
+                if (!equals(_a[i], _b[i])) {
                     reportInequality(a, b);
+                    return false;
+                }
             }
             return true;
+        } else if (type == WindowedMean.class){
+            WindowedMean wmA = (WindowedMean)a;
+            WindowedMean wmB = (WindowedMean)b;
+            float[] wmAValues = wmA.getWindowValues();
+            float[] wmBValues = wmB.getWindowValues();
+            boolean wasLogInequalities = logInequalities;
+            logInequalities = false; // wait for logging by objec
+            boolean equal = equals(wmAValues, wmBValues);
+            logInequalities = wasLogInequalities;
+            if (!equal)
+                reportInequality(a, b);
+            return equal;
         } else if (type == OrthographicCamera.class){
             OrthographicCamera camA = (OrthographicCamera)a;
             OrthographicCamera camB = (OrthographicCamera)b;

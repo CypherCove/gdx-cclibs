@@ -68,7 +68,7 @@ public class MathTest extends GdxToKryoTest {
         objects[21] = new Vector3(56f, -14f, 0);
 
         WindowedMean windowedMean = new WindowedMean(randSize());
-        for (int i = 0, n = (int)(randFloat() * 2f * windowedMean.getWindowSize()); i < n; i++) {
+        for (int i = 0, n = (int)((randFloat() +0.5f) * windowedMean.getWindowSize()); i < n; i++) {
             windowedMean.addValue(randFloat());
         }
         objects[22] = windowedMean;

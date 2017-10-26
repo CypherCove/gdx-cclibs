@@ -37,8 +37,7 @@ public class WindowedMeanSerializer extends Serializer<WindowedMean> {
     public WindowedMean read(Kryo kryo, Input input, Class<WindowedMean> type) {
         int size = input.readVarInt(true);
         int count = input.readVarInt(true);
-        float[] values = new float[count];
-        input.readFloats(count);
+        float[] values = input.readFloats(count);
         WindowedMean windowedMean = new WindowedMean(size);
         for (int i = 0; i < values.length; i++) {
             windowedMean.addValue(values[i]);
