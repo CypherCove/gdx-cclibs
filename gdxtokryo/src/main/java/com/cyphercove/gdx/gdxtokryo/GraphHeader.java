@@ -199,7 +199,7 @@ public class GraphHeader<T> implements KryoSerializable{
      */
     public boolean useCompactColor = true;
 
-    /**Whether Pixmap drawing parameters (i.e. {@link Pixmap#setColor(Color)}, {@link Pixmap#getBlending()}) should be
+    /**Whether Pixmap drawing parameters (i.e. {@link Pixmap#setFilter(Pixmap.Filter)}, {@link Pixmap#getBlending()}) should be
      * written and restored when read or copied. */
     public boolean includePixmapDrawingParams = false;
 

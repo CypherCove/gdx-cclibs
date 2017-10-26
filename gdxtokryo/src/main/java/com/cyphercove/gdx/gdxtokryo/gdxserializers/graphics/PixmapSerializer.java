@@ -19,15 +19,18 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.Field;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.cyphercove.gdx.gdxtokryo.GraphHeader;
 import com.cyphercove.gdx.gdxtokryo.SkippableSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.minlog.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 
 public class PixmapSerializer extends SkippableSerializer<Pixmap> {
@@ -293,12 +296,11 @@ public class PixmapSerializer extends SkippableSerializer<Pixmap> {
     private static int getPixmapColor (Pixmap pixmap){
         int color = 0;
         try {
-            Field colorField = Pixmap.class.getField("color");
-            color = colorField.getInt(pixmap);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Field colorField = ClassReflection.getDeclaredField(Pixmap.class, "color");
+            colorField.setAccessible(true);
+            color = (Integer)colorField.get(pixmap);
+        } catch (ReflectionException e) {
+            Log.error("Color field of pixmap could not be read. Using transparent black.", e);
         }
         return color;
     }
