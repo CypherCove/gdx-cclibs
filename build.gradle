@@ -16,11 +16,11 @@ apply plugin: 'io.codearte.nexus-staging'
 
 ext {
   GROUPID = 'com.cyphercove.gdx'
-  LIBRARY_VERSION = '1.1.1-SNAPSHOT'
+  LIBRARY_VERSION = '1.1.2-SNAPSHOT'
 }
 
 def isReleaseBuild() {
-  return true
+  return false
 }
 
 def getLibraryVersion() {
