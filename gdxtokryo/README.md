@@ -4,15 +4,21 @@ These are tools and serializers for using LibGDX with Kyro. Although most LibGDX
 
 Forward compatibility with all future versions of LibGDX is not guaranteed, because that would require inefficient chunked encoding. If the LibGDX classes evolve to contain additional data, attempts will be made to offer options for writing the data in a forward compatible way.
 
-## UNTESTED LIBRARY
+## Robust testing to be completed
 
 I am currently testing GdxToKryo in a large project, not yet released. When I am satisfied with its robustness, I will remove this notice. As of the 1.1.0 release, I do not intend to change the API, and it is theoretically ready for future compatibility. But I plan to more thoroughly test it before I commit to using it in a released product.
+
+I believe it should be safe to use in current products if you test it and find no issues, as the unit tests are working correctly for all the included serializers.
 
 ## Project dependency
 
 GdxToKryo is available via Maven Central. You can add it to your LibGDX project's base `build.gradle` under the `core` module's dependencies:
 
-    compile "com.cyphercove.gdx:flexbatch:1.1.0-SNAPSHOT"
+    compile "com.cyphercove.gdx:flexbatch:1.1.1"
+    
+or
+    
+    compile "com.cyphercove.gdx:flexbatch:1.1.2-SNAPSHOT"
     
 Do not use a `SNAPSHOT` version for a public release. Breaking changes may be made in between actual GdxToKryo releases.
 
