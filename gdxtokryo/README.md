@@ -14,11 +14,11 @@ I believe it should be safe to use in current products if you test it and find n
 
 GdxToKryo is available via Maven Central. You can add it to your LibGDX project's base `build.gradle` under the `core` module's dependencies:
 
-    compile "com.cyphercove.gdx:flexbatch:1.1.1"
+    compile "com.cyphercove.gdx:gdxtokryo:1.1.1"
     
 or
     
-    compile "com.cyphercove.gdx:flexbatch:1.1.2-SNAPSHOT"
+    compile "com.cyphercove.gdx:gdxtokryo:1.1.2-SNAPSHOT"
     
 Do not use a `SNAPSHOT` version for a public release. Breaking changes may be made in between actual GdxToKryo releases.
 
