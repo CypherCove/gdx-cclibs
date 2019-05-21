@@ -17,6 +17,24 @@ public class UtilsTest extends GdxToKryoTest {
         test.testCollections();
         test.testIdentityMap();
         test.testUtils();
+        test.testEmptyQueue();
+    }
+    
+    public void testEmptyQueue (){
+        Queue<GridPoint2> queue = new Queue<GridPoint2>();
+
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        Output output = new Output(outStream);
+        kryo.writeClassAndObject(output, queue);
+        output.close();
+        byte[] outBytes = outStream.toByteArray();
+
+        ByteArrayInputStream inStream = new ByteArrayInputStream(outBytes);
+        Input input = new Input(inStream);
+        Queue<GridPoint2> object1 = (Queue)kryo.readClassAndObject(input);
+        input.close();
+
+        object1.addFirst(new GridPoint2());
     }
 
     public void testCollections (){
