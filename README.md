@@ -5,7 +5,7 @@ This repository contains libraries for use with the LibGDX framework.
 
 ### [FlexBatch](flexbatch)
 
-A library for for batching many small custom objects optimally. It can be used as a flexible version of SpriteBatch, but where the sprites can have custom parameters, multi-texturing, bump-mapped lighting, etc.
+FlexBatch has moved to a new repo with a new groupname. [Look here](https://github.com/CypherCove/FlexBatch).
 
 ### [CoveTools](covetools)
 
