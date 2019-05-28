@@ -9,7 +9,7 @@ FlexBatch has moved to a new repo with a new groupname. [Look here](https://gith
 
 ### [CoveTools](covetools)
 
-A library containing utility classes, including AssignmentAssetManager, which allows assets to be specified, loaded, and referenced with very little code.
+CoveTools has moved to a new repo with a new groupname. [Look here](https://github.com/CypherCove/CoveTools).
 
 ### [GdxToKryo](gdxtokryo)
 

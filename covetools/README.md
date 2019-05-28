@@ -1,3 +1,7 @@
+# Project has moved
+
+Active development of CoveTools has moved [here](https://github.com/CypherCove/CoveTools).
+
 # CoveTools
 This is a set of utilities I use with LibGDX.
 
